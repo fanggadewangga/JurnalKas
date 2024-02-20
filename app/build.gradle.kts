@@ -116,4 +116,7 @@ dependencies {
     implementation("androidx.room:room-runtime:2.4.3")
     ksp("androidx.room:room-compiler:2.4.3")
     implementation("androidx.room:room-ktx:2.4.3")
+
+    // Chart
+    implementation("com.github.tehras:charts:0.2.4-alpha")
 }
