@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.ptotakkanan.jurnalkas.feature.category.CategoryScreen
 import com.ptotakkanan.jurnalkas.feature.common.route.Screen
 import com.ptotakkanan.jurnalkas.feature.login.LoginScreen
+import com.ptotakkanan.jurnalkas.feature.note.NoteScreen
 import com.ptotakkanan.jurnalkas.feature.register.RegisterScreen
 import com.ptotakkanan.jurnalkas.feature.welcome.WelcomeScreen
 
@@ -20,7 +21,7 @@ fun Navigation() {
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val screenHeight = LocalConfiguration.current.screenHeightDp
 
-    NavHost(navController = navController, startDestination = Screen.Category.route) {
+    NavHost(navController = navController, startDestination = Screen.Note.route) {
 
         composable(route = Screen.Welcome.route) {
             WelcomeScreen(navController = navController)
@@ -36,6 +37,10 @@ fun Navigation() {
         
         composable(route = Screen.Category.route) {
             CategoryScreen(navController = navController)
+        }
+        
+        composable(route = Screen.Note.route) {
+            NoteScreen(navController = navController)
         }
     }
 }

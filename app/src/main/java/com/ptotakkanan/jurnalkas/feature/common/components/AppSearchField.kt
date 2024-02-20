@@ -42,6 +42,7 @@ fun AppSearchField(
     textStyle: TextStyle = Typography.bodyLarge(),
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    contentPadding: Dp = 12.dp,
     onValueChange: (String) -> Unit,
 ) {
     Card(
@@ -69,11 +70,11 @@ fun AppSearchField(
             textStyle = textStyle,
             decorationBox = { innerTextField ->
                 Row(
-                    modifier.height(35.dp).padding(horizontal = 12.dp),
+                    modifier.height(35.dp).padding(horizontal = contentPadding),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     if (leadingIcon != null) leadingIcon()
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Box(
                         modifier = Modifier
                             .weight(1f)
