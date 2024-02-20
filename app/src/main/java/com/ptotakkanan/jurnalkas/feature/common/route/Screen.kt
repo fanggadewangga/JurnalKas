@@ -9,4 +9,12 @@ sealed class Screen(val route: String) {
     data object Wallet: Screen("wallet")
     data object Graph: Screen("graph")
     data object Note: Screen("note")
+    data object CategoryDetail: Screen("category_detail")
+
+    fun withArgs(vararg args: String) = buildString {
+        append(route)
+        args.forEach { arg ->
+            append("/$arg")
+        }
+    }
 }
