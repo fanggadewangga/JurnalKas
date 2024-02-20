@@ -29,15 +29,18 @@ fun AppDialog(
     onCancelClicked: () -> Unit,
     onConfirmClicked: () -> Unit,
     properties: DialogProperties = DialogProperties(),
+    modifier: Modifier = Modifier
 ) {
     Dialog(onDismissRequest = { setShowDialog(false) }, properties = properties) {
         Card(
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
+            modifier = modifier
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 24.dp)

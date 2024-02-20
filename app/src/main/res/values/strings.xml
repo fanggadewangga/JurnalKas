@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">JurnalKas</string>
+    <string name="success_login">Berhasil Login</string>
 </resources>

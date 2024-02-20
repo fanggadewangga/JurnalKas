@@ -227,6 +227,7 @@ fun AppBasicTextField(
     readOnly: Boolean = false,
     singleLine: Boolean = true,
     isWithBorder: Boolean = true,
+    borderWidth: Dp = 1.dp,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -243,7 +244,7 @@ fun AppBasicTextField(
             .background(color = backgroundColor, shape = shape)
             .height(textFieldHeight)
             .border(
-                width = 1.dp,
+                width = borderWidth,
                 color = if (isError) Red else borderColor,
                 shape = shape
             ) else
