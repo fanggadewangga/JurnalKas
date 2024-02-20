@@ -20,7 +20,7 @@ fun Navigation() {
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val screenHeight = LocalConfiguration.current.screenHeightDp
 
-    NavHost(navController = navController, startDestination = Screen.Login.route) {
+    NavHost(navController = navController, startDestination = Screen.Category.route) {
 
         composable(route = Screen.Welcome.route) {
             WelcomeScreen(navController = navController)
@@ -31,7 +31,7 @@ fun Navigation() {
         }
 
         composable(route = Screen.Register.route) {
-            RegisterScreen(navController = navController)
+            RegisterScreen(navController = navController, screenWidth = screenWidth)
         }
         
         composable(route = Screen.Category.route) {
