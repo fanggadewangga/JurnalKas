@@ -6,6 +6,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.ptotakkanan.jurnalkas.feature.analysis.AnalysisScreen
 import com.ptotakkanan.jurnalkas.feature.category.CategoryDetailScreen
 import com.ptotakkanan.jurnalkas.feature.category.CategoryScreen
 import com.ptotakkanan.jurnalkas.feature.common.route.Screen
@@ -25,7 +26,7 @@ fun Navigation() {
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val screenHeight = LocalConfiguration.current.screenHeightDp
 
-    NavHost(navController = navController, startDestination = Screen.FinancialRecap.route) {
+    NavHost(navController = navController, startDestination = Screen.Analysis.route) {
 
         composable(route = Screen.Welcome.route) {
             WelcomeScreen(navController = navController)
@@ -61,6 +62,10 @@ fun Navigation() {
 
         composable(route = Screen.FinancialRecap.route) {
             FinancialRecapScreen(navController = navController)
+        }
+        
+        composable(route = Screen.Analysis.route) {
+            AnalysisScreen(navController = navController)
         }
     }
 }
