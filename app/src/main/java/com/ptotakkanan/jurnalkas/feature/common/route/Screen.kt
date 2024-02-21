@@ -11,6 +11,7 @@ sealed class Screen(val route: String) {
     data object Note: Screen("note")
     data object CategoryDetail: Screen("category_detail")
     data object WalletDetail: Screen("wallet_detail")
+    data object FinancialRecap: Screen("financial_recap")
 
     fun withArgs(vararg args: String) = buildString {
         append(route)
