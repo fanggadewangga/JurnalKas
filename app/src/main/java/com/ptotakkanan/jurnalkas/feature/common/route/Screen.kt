@@ -13,6 +13,7 @@ sealed class Screen(val route: String) {
     data object WalletDetail: Screen("wallet_detail")
     data object FinancialRecap: Screen("financial_recap")
     data object Analysis: Screen("analysis")
+    data object Calendar: Screen("calendar")
 
     fun withArgs(vararg args: String) = buildString {
         append(route)
