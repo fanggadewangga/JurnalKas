@@ -28,9 +28,23 @@ import com.ptotakkanan.jurnalkas.feature.common.route.Screen
 import com.ptotakkanan.jurnalkas.theme.Typography
 import com.ptotakkanan.jurnalkas.theme.primary10
 import com.ptotakkanan.jurnalkas.theme.primary20
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ptotakkanan.jurnalkas.feature.common.util.ObserveAsEvents
 
 @Composable
-fun WelcomeScreen(navController: NavController) {
+fun WelcomeScreen(
+    navController: NavController,
+    viewModel: WelcomeViewModel = viewModel(),
+) {
+
+    ObserveAsEvents(flow = viewModel.eventFlow) { event ->
+        when(event) {
+            WelcomeViewModel.UiEvent.NavigateToHome -> {
+                navController.navigate(Screen.Calendar.route)
+            }
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         AsyncImage(
             model = R.drawable.iv_ellipse_1,

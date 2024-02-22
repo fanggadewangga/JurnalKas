@@ -65,4 +65,8 @@ class AppRepository {
             emit(Resource.Error(e.message))
         }
     }.flowOn(Dispatchers.IO)
+
+    fun checkAuthStatus(): Boolean {
+        return currentUser != null
+    }
 }
