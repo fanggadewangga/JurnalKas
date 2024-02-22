@@ -187,7 +187,7 @@ fun InputOutcomeScreen(navController: NavController, viewModel: InputViewModel, 
                         colorFilter = ColorFilter.tint(primary20)
                     )
                     AppText(
-                        text = viewModel.selectedOutcomeCategory().category,
+                        text = state.chosenOutcomeCategory,
                         textStyle = Typography.titleSmall().copy(fontSize = 12.sp),
                         color = primary20
                     )
@@ -197,13 +197,13 @@ fun InputOutcomeScreen(navController: NavController, viewModel: InputViewModel, 
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     AsyncImage(
-                        model = viewModel.selectedWallet().icon,
+                        model = state.chosenWallet,
                         contentDescription = "Category box",
                         colorFilter = ColorFilter.tint(primary20),
                         modifier = Modifier.size(16.dp)
                     )
                     AppText(
-                        text = viewModel.selectedWallet().name,
+                        text = state.chosenWallet?.name ?: "",
                         textStyle = Typography.titleSmall().copy(fontSize = 12.sp),
                         color = primary20
                     )

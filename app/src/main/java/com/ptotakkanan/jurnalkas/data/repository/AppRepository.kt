@@ -9,6 +9,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.ptotakkanan.jurnalkas.data.Resource
 import com.ptotakkanan.jurnalkas.data.model.User
 import com.ptotakkanan.jurnalkas.data.util.FirebaseCollections
+import com.ptotakkanan.jurnalkas.domain.Wallet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -69,4 +70,25 @@ class AppRepository {
     fun checkAuthStatus(): Boolean {
         return currentUser != null
     }
+
+    suspend fun fetchWallets(): Flow<Resource<List<Wallet>>> = flow {
+        emit(Resource.Loading())
+        val walletList = mutableListOf<Wallet>()
+        try {
+            val snapshot = firestore.collection(FirebaseCollections.WALLET).get().await()
+            for (document in snapshot.documents) {
+                val walletId = document.id
+                val imageUrl = document.getString("imageUrl") ?: ""
+                val name = document.getString("name") ?: ""
+                val balance = document.getLong("balance") ?: 0L
+
+                val wallet = Wallet(walletId = walletId, name = name, icon = imageUrl, balance = balance)
+                walletList.add(wallet)
+            }
+            emit(Resource.Success(walletList.toList()))
+        } catch (e: Exception) {
+            Log.d("Fetch Wallet", e.message.toString())
+            emit(Resource.Error(e.message))
+        }
+    }.flowOn(Dispatchers.IO)
 }

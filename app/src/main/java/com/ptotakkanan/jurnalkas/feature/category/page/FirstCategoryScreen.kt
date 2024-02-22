@@ -76,24 +76,22 @@ fun FirstCategoryScreen(
                         )
                 )
             }
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Card(
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(4.dp),
-            modifier = Modifier
-                .size(90.dp)
-                .clickable { scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) } }
-                .align(Alignment.CenterHorizontally)
-        ) {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                AsyncImage(
-                    model = R.drawable.ic_add,
-                    contentDescription = "Add icon",
-                    colorFilter = ColorFilter.tint(primary20),
-                    modifier = Modifier.size(40.dp)
-                )
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(4.dp),
+                modifier = Modifier
+                    .size(90.dp)
+                    .clickable { scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) } }
+            ) {
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                    AsyncImage(
+                        model = R.drawable.ic_add,
+                        contentDescription = "Add icon",
+                        colorFilter = ColorFilter.tint(primary20),
+                        modifier = Modifier.size(40.dp)
+                    )
+                }
             }
         }
     }

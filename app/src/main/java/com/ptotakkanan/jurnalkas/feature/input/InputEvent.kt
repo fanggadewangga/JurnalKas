@@ -13,4 +13,5 @@ sealed class InputEvent {
     data class EnterNominalByNumpad(val value: String): InputEvent()
     data object DeleteNominalByNumpad : InputEvent()
     data class SwitchTab(val value: SelectionOption<String>): InputEvent()
+    data object FetchWallets: InputEvent()
 }

@@ -5,7 +5,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -19,6 +18,7 @@ import androidx.navigation.NavController
 import com.ptotakkanan.jurnalkas.R
 import com.ptotakkanan.jurnalkas.feature.input.components.TabOptionItem
 import com.ptotakkanan.jurnalkas.feature.input.page.InputOutcomeScreen
+import com.ptotakkanan.jurnalkas.feature.input.page.WalletOptionScreen
 import com.ptotakkanan.jurnalkas.theme.blue50
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -67,6 +67,7 @@ fun InputScreen(
 
         if (viewModel.tabOptions.last().selected)
             InputOutcomeScreen(navController = navController, viewModel = viewModel, state = state)
-
+        else
+            WalletOptionScreen(viewModel = viewModel, state = state)
     }
 }

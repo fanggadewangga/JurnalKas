@@ -1,14 +1,19 @@
 package com.ptotakkanan.jurnalkas.feature.input
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ptotakkanan.jurnalkas.R
+import com.ptotakkanan.jurnalkas.data.Resource
+import com.ptotakkanan.jurnalkas.data.repository.AppRepository
 import com.ptotakkanan.jurnalkas.domain.Category
 import com.ptotakkanan.jurnalkas.domain.Wallet
 import com.ptotakkanan.jurnalkas.feature.util.state.SelectionOption
+import kotlinx.coroutines.launch
 
-class InputViewModel: ViewModel() {
+class InputViewModel : ViewModel() {
 
     private val _outcomeCategories = listOf(
         SelectionOption(Category("Makan", R.drawable.ic_food), true),
@@ -23,16 +28,6 @@ class InputViewModel: ViewModel() {
 
     val outcomeCategories: List<SelectionOption<Category>>
         get() = _outcomeCategories
-
-    private val _wallets = listOf(
-        SelectionOption(Wallet("BCA", R.drawable.iv_bca), false),
-        SelectionOption(Wallet("Shopee Pay", R.drawable.iv_sppay), false),
-        SelectionOption(Wallet("Mandiri", R.drawable.iv_mandiri), false),
-        SelectionOption(Wallet("Tunai", R.drawable.ic_wallet_category), true),
-    ).toMutableStateList()
-
-    val wallets: List<SelectionOption<Wallet>>
-        get() = _wallets
 
     private val _tabOptions = listOf(
         SelectionOption("Dompet", false),
@@ -49,8 +44,10 @@ class InputViewModel: ViewModel() {
     private val _state = mutableStateOf(InputState())
     val state = _state
 
+    private val repository = AppRepository()
+
     fun onEvent(event: InputEvent) {
-        when(event) {
+        when (event) {
             is InputEvent.EnterDescription -> {
                 _state.value = _state.value.copy(description = event.value)
             }
@@ -58,33 +55,68 @@ class InputViewModel: ViewModel() {
             is InputEvent.ChooseOutcomeCategory -> {
                 _outcomeCategories.forEach { it.selected = false }
                 _outcomeCategories.find { it.option == event.value.option }?.selected = true
-                _state.value = _state.value.copy(chosenOutcomeCategory = event.value.option.category)
+                _state.value =
+                    _state.value.copy(chosenOutcomeCategory = event.value.option.category)
             }
+
             is InputEvent.ChooseWalletCategory -> {
-                _wallets.forEach { it.selected = false }
-                _wallets.find { it.option == event.value.option }?.selected = true
+                _state.value.wallet.forEach { it.selected = false }
+                _state.value.wallet.find { it.option == event.value.option }?.selected = true
                 _state.value = _state.value.copy(chosenOutcomeCategory = event.value.option.name)
             }
+
             is InputEvent.EnterDate -> {
                 _state.value = _state.value.copy(date = event.value)
             }
+
             is InputEvent.EnterNominal -> {
                 _state.value = _state.value.copy(date = event.value)
             }
+
             is InputEvent.SwitchTab -> {
                 _tabOptions.forEach { it.selected = false }
                 _tabOptions.find { it.option == event.value.option }?.selected = true
                 _state.value = _state.value.copy(selectedTab = event.value.option)
             }
+
             is InputEvent.DeleteNominalByNumpad -> {
 
             }
+
             is InputEvent.EnterNominalByNumpad -> {
 
+            }
+
+            InputEvent.FetchWallets -> {
+                viewModelScope.launch {
+                    repository.fetchWallets().collect { result ->
+                        when (result) {
+                            is Resource.Loading -> _state.value =
+                                _state.value.copy(isLoading = true)
+
+                            is Resource.Error -> {}
+                            is Resource.Success -> {
+                                val selectionOptions = mutableStateListOf<SelectionOption<Wallet>>()
+                                result.data?.forEach { wallet ->
+                                    if (wallet == result.data.first())
+                                        selectionOptions.add(SelectionOption(wallet, true))
+                                    else
+                                        selectionOptions.add(SelectionOption(wallet, false))
+                                }
+                                _state.value = _state.value.copy(
+                                    isLoading = false,
+                                    wallet = selectionOptions,
+                                    chosenWallet = result.data?.first()
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 
-    fun selectedOutcomeCategory() = _outcomeCategories.first { it.selected }.option
-    fun selectedWallet() = _wallets.first { it.selected }.option
+    init {
+        onEvent(InputEvent.FetchWallets)
+    }
 }

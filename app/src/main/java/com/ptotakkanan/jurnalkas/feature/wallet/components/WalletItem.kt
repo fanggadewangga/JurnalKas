@@ -34,7 +34,7 @@ fun WalletItem(
     modifier: Modifier = Modifier,
     name: String,
     nominal: Long,
-    @DrawableRes icon: Int,
+    imageUrl: String,
     onClick: () -> Unit,
 ) {
     Card(
@@ -55,7 +55,7 @@ fun WalletItem(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 AsyncImage(
-                    model = icon,
+                    model = imageUrl,
                     contentDescription = "Note icon",
                     modifier = Modifier.size(32.dp)
                 )
