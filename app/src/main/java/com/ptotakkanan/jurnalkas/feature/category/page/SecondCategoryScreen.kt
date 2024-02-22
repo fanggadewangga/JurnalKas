@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.ptotakkanan.jurnalkas.feature.category.CategoryEvent
-import com.ptotakkanan.jurnalkas.feature.category.CategoryViewModel
+import com.ptotakkanan.jurnalkas.feature.category.detail.CategoryViewModel
 import com.ptotakkanan.jurnalkas.feature.category.components.CategoryItem
 import kotlinx.coroutines.launch
 

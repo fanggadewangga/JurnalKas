@@ -1,4 +1,4 @@
-package com.ptotakkanan.jurnalkas.feature.category
+package com.ptotakkanan.jurnalkas.feature.category.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

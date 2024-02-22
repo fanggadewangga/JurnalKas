@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.ptotakkanan.jurnalkas.R
 import com.ptotakkanan.jurnalkas.feature.category.CategoryEvent
-import com.ptotakkanan.jurnalkas.feature.category.CategoryViewModel
+import com.ptotakkanan.jurnalkas.feature.category.detail.CategoryViewModel
 import com.ptotakkanan.jurnalkas.feature.category.components.CategoryItem
 import com.ptotakkanan.jurnalkas.feature.common.components.AppText
 import com.ptotakkanan.jurnalkas.theme.Typography

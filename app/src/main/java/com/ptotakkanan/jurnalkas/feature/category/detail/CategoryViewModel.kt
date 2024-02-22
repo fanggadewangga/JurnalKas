@@ -1,4 +1,4 @@
-package com.ptotakkanan.jurnalkas.feature.category
+package com.ptotakkanan.jurnalkas.feature.category.detail
 
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.toMutableStateList
@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ptotakkanan.jurnalkas.R
 import com.ptotakkanan.jurnalkas.domain.Category
+import com.ptotakkanan.jurnalkas.feature.category.CategoryEvent
 import com.ptotakkanan.jurnalkas.feature.util.state.SelectionOption
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow

@@ -8,8 +8,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ptotakkanan.jurnalkas.feature.analysis.AnalysisScreen
 import com.ptotakkanan.jurnalkas.feature.calendar.CalendarScreen
-import com.ptotakkanan.jurnalkas.feature.category.CategoryDetailScreen
+import com.ptotakkanan.jurnalkas.feature.category.detail.CategoryDetailScreen
 import com.ptotakkanan.jurnalkas.feature.category.CategoryScreen
+import com.ptotakkanan.jurnalkas.feature.category.add.AddCategoryScreen
 import com.ptotakkanan.jurnalkas.feature.common.route.Screen
 import com.ptotakkanan.jurnalkas.feature.input.InputScreen
 import com.ptotakkanan.jurnalkas.feature.login.LoginScreen
@@ -30,7 +31,7 @@ fun Navigation() {
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val screenHeight = LocalConfiguration.current.screenHeightDp
 
-    NavHost(navController = navController, startDestination = Screen.Input.route) {
+    NavHost(navController = navController, startDestination = Screen.AddCategory.route) {
 
         composable(route = Screen.Welcome.route) {
             WelcomeScreen(navController = navController)
@@ -86,6 +87,10 @@ fun Navigation() {
 
         composable(route = Screen.Input.route) {
             InputScreen(navController = navController)
+        }
+
+        composable(route = Screen.AddCategory.route) {
+            AddCategoryScreen(navController = navController)
         }
     }
 }
