@@ -1,5 +1,6 @@
 package com.ptotakkanan.jurnalkas.feature.login
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -32,7 +35,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.ptotakkanan.jurnalkas.R
-import com.ptotakkanan.jurnalkas.feature.common.components.AppBasicTextField
 import com.ptotakkanan.jurnalkas.feature.common.components.AppButton
 import com.ptotakkanan.jurnalkas.feature.common.components.AppDialog
 import com.ptotakkanan.jurnalkas.feature.common.components.AppText
@@ -102,32 +104,40 @@ fun LoginScreen(
             textAlign = TextAlign.Center
 
         )
-        AppBasicTextField(
-            placeHolder = "Email",
+        TextField(
             value = emailState.text ?: "",
             onValueChange = { viewModel.onEvent(LoginEvent.EnterEmail(it)) },
+            placeholder = { AppText(text = "Email", color = Color.Gray) },
             shape = RoundedCornerShape(10.dp),
-            borderWidth = 2.dp,
-            borderColor = if (emailState.isFocus) primary20 else Color.Transparent,
-            backgroundColor = blue50,
-            textFieldHeight = 64.dp,
+            textStyle = Typography.bodyLarge(),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = blue50,
+                unfocusedContainerColor = blue50,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
+                .border(width = 2.dp, color = primary20, shape = RoundedCornerShape(10.dp))
         )
-        AppBasicTextField(
-            placeHolder = "Password",
+        TextField(
             value = passwordState.text ?: "",
             onValueChange = { viewModel.onEvent(LoginEvent.EnterPassword(it)) },
+            placeholder = { AppText(text = "Password", color = Color.Gray) },
             shape = RoundedCornerShape(10.dp),
-            borderWidth = 2.dp,
-            borderColor = if (passwordState.isFocus) primary20 else Color.Transparent,
-            textFieldHeight = 64.dp,
-            backgroundColor = blue50,
+            textStyle = Typography.bodyLarge(),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = blue50,
+                unfocusedContainerColor = blue50,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
+                .border(width = 2.dp, color = primary20, shape = RoundedCornerShape(10.dp))
         )
         AppText(
             text = "Lupa Password Anda?",

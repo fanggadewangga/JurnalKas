@@ -32,7 +32,7 @@ fun Navigation() {
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val screenHeight = LocalConfiguration.current.screenHeightDp
 
-    NavHost(navController = navController, startDestination = Screen.Calendar.route) {
+    NavHost(navController = navController, startDestination = Screen.Welcome.route) {
 
         composable(route = Screen.Welcome.route) {
             WelcomeScreen(navController = navController)
