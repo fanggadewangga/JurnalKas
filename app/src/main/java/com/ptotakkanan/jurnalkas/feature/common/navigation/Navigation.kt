@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ptotakkanan.jurnalkas.feature.analysis.AnalysisScreen
 import com.ptotakkanan.jurnalkas.feature.calendar.CalendarScreen
+import com.ptotakkanan.jurnalkas.feature.calendar.detail.CalendarDetailScreen
 import com.ptotakkanan.jurnalkas.feature.category.detail.CategoryDetailScreen
 import com.ptotakkanan.jurnalkas.feature.category.CategoryScreen
 import com.ptotakkanan.jurnalkas.feature.category.add.AddCategoryScreen
@@ -31,7 +32,7 @@ fun Navigation() {
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val screenHeight = LocalConfiguration.current.screenHeightDp
 
-    NavHost(navController = navController, startDestination = Screen.AddCategory.route) {
+    NavHost(navController = navController, startDestination = Screen.Calendar.route) {
 
         composable(route = Screen.Welcome.route) {
             WelcomeScreen(navController = navController)
@@ -73,8 +74,8 @@ fun Navigation() {
             AnalysisScreen(navController = navController)
         }
         
-        composable(route = Screen.Calendar.route) {
-            CalendarScreen(navController = navController, screenWidth = screenWidth)
+        composable(route = Screen.CalendarDetail.route) {
+            CalendarDetailScreen(navController = navController, screenWidth = screenWidth)
         }
 
         composable(route = Screen.Profile.route) {
@@ -91,6 +92,10 @@ fun Navigation() {
 
         composable(route = Screen.AddCategory.route) {
             AddCategoryScreen(navController = navController)
+        }
+
+        composable(route = Screen.Calendar.route) {
+            CalendarScreen(navController = navController)
         }
     }
 }
