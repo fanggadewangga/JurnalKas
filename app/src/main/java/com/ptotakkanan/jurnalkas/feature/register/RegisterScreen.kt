@@ -59,12 +59,16 @@ fun RegisterScreen(
 
     ObserveAsEvents(flow = viewModel.eventFlow) { event ->
         when (event) {
-            is RegisterViewModel.UiEvent.ShowToast -> {
-                Toasty.success(context, R.string.success_register).show()
+            is RegisterViewModel.UiEvent.ShowSuccessToast -> {
+                Toasty.success(context, event.message).show()
             }
 
             is RegisterViewModel.UiEvent.NavigateToLogin -> {
                 navController.navigate(Screen.Login.route)
+            }
+
+            is RegisterViewModel.UiEvent.ShowErrorToast -> {
+                Toasty.error(context, event.message).show()
             }
         }
     }

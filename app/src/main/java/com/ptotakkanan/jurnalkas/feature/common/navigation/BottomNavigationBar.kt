@@ -21,8 +21,8 @@ import com.ptotakkanan.jurnalkas.theme.secondary0
 fun BottomNavigationBar(navController: NavController) {
     val navigationItems = listOf(
         BottomNavigationItem.Wallet,
-        BottomNavigationItem.Home,
-        BottomNavigationItem.Graph,
+        BottomNavigationItem.Calendar,
+        BottomNavigationItem.Input,
     )
 
     NavigationBar(

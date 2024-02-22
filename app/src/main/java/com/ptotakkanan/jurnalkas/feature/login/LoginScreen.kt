@@ -64,12 +64,16 @@ fun LoginScreen(
 
     ObserveAsEvents(flow = viewModel.eventFlow) { event ->
         when (event) {
-            is LoginViewModel.UiEvent.ShowToast -> {
+            is LoginViewModel.UiEvent.ShowSuccessToast -> {
                 Toasty.success(context, R.string.success_login).show()
             }
 
             is LoginViewModel.UiEvent.NavigateToHomeScreen -> {
+                navController.navigate(Screen.Calendar.route)
+            }
 
+            is LoginViewModel.UiEvent.ShowErrorToast -> {
+                Toasty.error(context, event.message).show()
             }
         }
     }
