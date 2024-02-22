@@ -11,6 +11,7 @@ import com.ptotakkanan.jurnalkas.feature.calendar.CalendarScreen
 import com.ptotakkanan.jurnalkas.feature.category.CategoryDetailScreen
 import com.ptotakkanan.jurnalkas.feature.category.CategoryScreen
 import com.ptotakkanan.jurnalkas.feature.common.route.Screen
+import com.ptotakkanan.jurnalkas.feature.input.InputScreen
 import com.ptotakkanan.jurnalkas.feature.login.LoginScreen
 import com.ptotakkanan.jurnalkas.feature.note.NoteScreen
 import com.ptotakkanan.jurnalkas.feature.profile.ProfileScreen
@@ -29,7 +30,7 @@ fun Navigation() {
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val screenHeight = LocalConfiguration.current.screenHeightDp
 
-    NavHost(navController = navController, startDestination = Screen.TaxScreen.route) {
+    NavHost(navController = navController, startDestination = Screen.Input.route) {
 
         composable(route = Screen.Welcome.route) {
             WelcomeScreen(navController = navController)
@@ -79,8 +80,12 @@ fun Navigation() {
             ProfileScreen(navController = navController)
         }
         
-        composable(route = Screen.TaxScreen.route) {
+        composable(route = Screen.Tax.route) {
             TaxScreen(navController = navController)
+        }
+
+        composable(route = Screen.Input.route) {
+            InputScreen(navController = navController)
         }
     }
 }
