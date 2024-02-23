@@ -1,7 +1,9 @@
 package com.ptotakkanan.jurnalkas.feature.wallet
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,6 +50,7 @@ import com.ptotakkanan.jurnalkas.theme.blue60
 import com.ptotakkanan.jurnalkas.theme.green20
 import com.ptotakkanan.jurnalkas.theme.primary20
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ptotakkanan.jurnalkas.feature.common.route.Screen
 
 @Composable
 fun WalletScreen(
@@ -69,7 +72,7 @@ fun WalletScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {  },
+                onClick = { },
                 shape = CircleShape,
                 containerColor = Color.White,
                 modifier = Modifier.size(56.dp)
@@ -238,7 +241,14 @@ fun WalletScreen(
                     name = wallet.name,
                     nominal = wallet.balance,
                     imageUrl = wallet.icon,
-                    onClick = {},
+                    onClick = {
+                        navController.navigate(
+                            Screen.WalletDetail.route.replace(
+                                oldValue = "{walletId}",
+                                newValue = wallet.walletId
+                            )
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
             }

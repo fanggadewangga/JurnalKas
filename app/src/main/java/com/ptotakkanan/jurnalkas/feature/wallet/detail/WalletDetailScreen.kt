@@ -1,4 +1,4 @@
-package com.ptotakkanan.jurnalkas.feature.wallet
+package com.ptotakkanan.jurnalkas.feature.wallet.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,14 +16,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,18 +34,44 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.ptotakkanan.jurnalkas.R
 import com.ptotakkanan.jurnalkas.feature.common.components.AppButton
+import com.ptotakkanan.jurnalkas.feature.common.components.AppDialog
 import com.ptotakkanan.jurnalkas.feature.common.components.AppText
+import com.ptotakkanan.jurnalkas.feature.common.util.ObserveAsEvents
 import com.ptotakkanan.jurnalkas.feature.wallet.components.TransactionBox
 import com.ptotakkanan.jurnalkas.feature.wallet.components.TransactionItem
 import com.ptotakkanan.jurnalkas.theme.Typography
 import com.ptotakkanan.jurnalkas.theme.blue60
+import com.ptotakkanan.jurnalkas.theme.primary10
 import com.ptotakkanan.jurnalkas.theme.primary20
+import es.dmoral.toasty.Toasty
 
 @Composable
 fun WalletDetailScreen(
     navController: NavController,
+    walletId: String,
     viewModel: WalletDetailViewModel = viewModel(),
 ) {
+
+    LaunchedEffect(Unit) { viewModel.fetchWalletDetail(walletId) }
+
+    val context = LocalContext.current
+    val state by viewModel.state
+
+    ObserveAsEvents(flow = viewModel.eventFlow) { event ->
+        when(event) {
+            is WalletDetailViewModel.UiEvent.ShowErrorMessage -> Toasty.error(context, event.message).show()
+        }
+    }
+
+    if (state.isLoading)
+        AppDialog(
+            dialogContent = { CircularProgressIndicator(color = primary10) },
+            setShowDialog = {},
+            onCancelClicked = {},
+            onConfirmClicked = {},
+            modifier = Modifier.size(120.dp)
+        )
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(32.dp),
@@ -87,12 +115,12 @@ fun WalletDetailScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 AsyncImage(
-                    model = R.drawable.ic_cash,
+                    model = state.walletDetail?.wallet?.icon,
                     contentDescription = "Cash icon",
                     modifier = Modifier.size(16.dp)
                 )
                 AppText(
-                    text = "Tunai",
+                    text = state.walletDetail?.wallet?.name ?: "",
                     color = primary20,
                     textStyle = Typography.titleMedium()
                         .copy(fontSize = 16.sp, fontWeight = FontWeight(700))
@@ -128,16 +156,18 @@ fun WalletDetailScreen(
 
         // Transaction Summary Box
         TransactionBox(
-            income = 500000,
-            outcome = 82000,
-            modifier = Modifier.fillMaxWidth().wrapContentHeight()
+            income = state.walletDetail?.income ?: 0,
+            outcome = state.walletDetail?.outcome ?: 0,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
         )
 
 
         // Transactions
-        /*LazyColumn {
-            val groupedTransactions = viewModel.dummyTransaction.groupBy { it.date }
-            groupedTransactions.forEach { (date, transaction) ->
+        LazyColumn {
+            val groupedTransactions = state.walletDetail?.transactions?.groupBy { it.date }
+            groupedTransactions?.forEach { (date, transaction) ->
                 item {
                     AppText(
                         text = date,
@@ -158,6 +188,6 @@ fun WalletDetailScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                 }
             }
-        }*/
+        }
     }
 }

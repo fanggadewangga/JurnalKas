@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -38,11 +39,13 @@ import com.ptotakkanan.jurnalkas.R
 import com.ptotakkanan.jurnalkas.core.ext.toCurrency
 import com.ptotakkanan.jurnalkas.feature.common.components.AppText
 import com.ptotakkanan.jurnalkas.feature.common.navigation.BottomNavigationBar
+import com.ptotakkanan.jurnalkas.feature.common.util.ObserveAsEvents
 import com.ptotakkanan.jurnalkas.feature.input.components.TabOptionItem
 import com.ptotakkanan.jurnalkas.feature.wallet.components.TransactionItem
 import com.ptotakkanan.jurnalkas.theme.Typography
 import com.ptotakkanan.jurnalkas.theme.blue50
 import com.ptotakkanan.jurnalkas.theme.primary20
+import es.dmoral.toasty.Toasty
 
 @Composable
 fun CalendarScreen(
@@ -51,6 +54,13 @@ fun CalendarScreen(
 ) {
 
     val state by viewModel.state
+    val context = LocalContext.current
+
+    ObserveAsEvents(flow = viewModel.eventFlow) { event ->
+        when(event) {
+            is CalendarViewModel.UiEvent.ShowErrorMessage -> Toasty.error(context, event.message).show()
+        }
+    }
 
     Scaffold(
         bottomBar = {
@@ -139,7 +149,7 @@ fun CalendarScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     AppText(
-                        text = 14160000L.toCurrency(),
+                        text = state.totalMoney.toCurrency(),
                         textStyle = TextStyle(
                             fontFamily = FontFamily(Font(R.font.poppins_bold)),
                             fontSize = 24.sp,
@@ -187,42 +197,43 @@ fun CalendarScreen(
             ) {
 
                 // Calendar
-                Card(
-                    elevation = CardDefaults.cardElevation(8.dp),
-                    shape = RoundedCornerShape(32.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    modifier = Modifier.padding(24.dp)
-                ) {
-                    AndroidView(
-                        factory = {
-                            CalendarView(it)
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 32.dp)
-                            .align(Alignment.CenterHorizontally)
-                    )
-                }
-
-               /* val groupedTransactions = viewModel.dummyTransaction.groupBy { it.date }
-                groupedTransactions.forEach { (date, transaction) ->
-                    AppText(
-                        text = date,
-                        color = primary20,
-                        textStyle = Typography.titleMedium()
-                            .copy(fontSize = 12.sp, fontWeight = FontWeight(600)),
-                        modifier = Modifier.padding(horizontal = 24.dp)
-                    )
-                    transaction.forEach { item ->
-                        TransactionItem(
-                            transaction = item,
+                if (state.selectedTab == viewModel.tabOptions.first().option)
+                    Card(
+                        elevation = CardDefaults.cardElevation(8.dp),
+                        shape = RoundedCornerShape(32.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        modifier = Modifier.padding(24.dp)
+                    ) {
+                        AndroidView(
+                            factory = {
+                                CalendarView(it)
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 4.dp, horizontal = 24.dp)
+                                .padding(horizontal = 32.dp)
+                                .align(Alignment.CenterHorizontally)
                         )
                     }
-                    Spacer(modifier = Modifier.height(12.dp))
-                }*/
+
+                 val groupedTransactions = state.transactions.groupBy { it.date }
+                 groupedTransactions.forEach { (date, transaction) ->
+                     AppText(
+                         text = date,
+                         color = primary20,
+                         textStyle = Typography.titleMedium()
+                             .copy(fontSize = 12.sp, fontWeight = FontWeight(600)),
+                         modifier = Modifier.padding(horizontal = 24.dp)
+                     )
+                     transaction.forEach { item ->
+                         TransactionItem(
+                             transaction = item,
+                             modifier = Modifier
+                                 .fillMaxWidth()
+                                 .padding(vertical = 4.dp, horizontal = 24.dp)
+                         )
+                     }
+                     Spacer(modifier = Modifier.height(12.dp))
+                 }
             }
         }
     }

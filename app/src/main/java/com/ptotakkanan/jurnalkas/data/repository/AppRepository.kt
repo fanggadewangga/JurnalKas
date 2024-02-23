@@ -12,6 +12,10 @@ import com.ptotakkanan.jurnalkas.data.model.User
 import com.ptotakkanan.jurnalkas.data.util.FirebaseCollections
 import com.ptotakkanan.jurnalkas.domain.Transaction
 import com.ptotakkanan.jurnalkas.domain.Wallet
+import com.ptotakkanan.jurnalkas.domain.WalletDetail
+import com.ptotakkanan.jurnalkas.feature.util.mapper.Mapper.toTransaction
+import com.ptotakkanan.jurnalkas.feature.util.mapper.Mapper.toUser
+import com.ptotakkanan.jurnalkas.feature.util.mapper.Mapper.toWallet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
@@ -105,7 +109,9 @@ class AppRepository {
                 is Resource.Success -> {
                     try {
                         send(Resource.Loading())
-                        val documentRef = firestore.collection("transactions").add(transaction).await()
+                        val documentRef =
+                            firestore.collection(FirebaseCollections.TRANSACTION).add(transaction)
+                                .await()
                         val transactionId = documentRef.id
                         val updatedTransaction = transaction.copy(transactionId = transactionId)
                         documentRef.set(updatedTransaction).await()
@@ -140,6 +146,82 @@ class AppRepository {
             emit(Resource.Success(Unit))
         } catch (e: FirebaseFirestoreException) {
             Log.d("Update Balance", e.message.toString())
+            emit(Resource.Error(e.message))
+        }
+    }
+
+    fun fetchWalletDetail(walletId: String): Flow<Resource<WalletDetail>> = flow {
+        emit(Resource.Loading())
+        try {
+            val wallet = firestore.collection(FirebaseCollections.WALLET)
+                .document(walletId)
+                .get()
+                .await()
+                .toWallet()
+
+            val transactions = firestore.collection(FirebaseCollections.TRANSACTION)
+                .whereEqualTo("walletId", walletId)
+                .get()
+                .await()
+                .documents.map { it.toTransaction() }
+
+            Log.d("Transaction Wallet", transactions.size.toString())
+
+            val income = transactions.filter { it.isIncome }.sumOf { it.nominal }
+            val outcome = transactions.filter { !it.isIncome }.sumOf { it.nominal }
+
+            val walletDetail = WalletDetail(wallet, income, outcome, transactions)
+            emit(Resource.Success(walletDetail))
+        } catch (e: FirebaseFirestoreException) {
+            Log.d("Fetch Wallet Detail", e.message.toString())
+            emit(Resource.Error(e.message))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun fetchTransactions(): Flow<Resource<List<Transaction>>> = flow {
+        emit(Resource.Loading())
+        try {
+            val transactions = firestore.collection(FirebaseCollections.TRANSACTION)
+                .get()
+                .await()
+                .map { it.toTransaction() }
+            emit(Resource.Success(transactions))
+        } catch (e: FirebaseFirestoreException) {
+            Log.d("Fetch Transaction", e.message.toString())
+            emit(Resource.Error(e.message))
+        }
+    }
+
+    fun fetchBalance(): Flow<Resource<Long>> = flow {
+        emit(Resource.Loading())
+        try {
+            val balance = firestore.collection(FirebaseCollections.WALLET)
+                .get()
+                .await()
+                .sumOf {
+                    val balance = it.getLong("balance") ?: 0L
+                    balance
+                }
+            emit(Resource.Success(balance))
+        } catch (e: FirebaseFirestoreException) {
+            Log.d("Fetch Balance", e.message.toString())
+            emit(Resource.Error(e.message))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun fetchUserDetail(): Flow<Resource<User>> = flow {
+        emit(Resource.Loading())
+        try {
+            val uid = currentUser!!.uid
+            val user = firestore.collection(FirebaseCollections.USER)
+                .document(uid)
+                .get()
+                .await()
+                .toUser()
+
+            emit(Resource.Success(user))
+        } catch (e: FirebaseFirestoreException) {
+            Log.d("Fetch Balance", e.message.toString())
             emit(Resource.Error(e.message))
         }
     }

@@ -6,8 +6,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -17,8 +18,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ptotakkanan.jurnalkas.R
 import com.ptotakkanan.jurnalkas.feature.input.components.TabOptionItem
-import com.ptotakkanan.jurnalkas.feature.input.page.InputOutcomeScreen
 import com.ptotakkanan.jurnalkas.feature.input.page.InputIncomeScreen
+import com.ptotakkanan.jurnalkas.feature.input.page.InputOutcomeScreen
 import com.ptotakkanan.jurnalkas.theme.blue50
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -35,8 +36,8 @@ fun InputScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(color = blue50)
-            .padding(start = 24.dp, top = 24.dp, end = 24.dp)
     ) {
+        Spacer(modifier = Modifier.height(24.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -66,8 +67,8 @@ fun InputScreen(
         }
 
         if (viewModel.tabOptions.last().selected)
-            InputOutcomeScreen(navController = navController, viewModel = viewModel, state = state)
+            InputOutcomeScreen(navController, viewModel, state)
         else
-            InputIncomeScreen(viewModel = viewModel, state = state)
+            InputIncomeScreen(navController, viewModel, state)
     }
 }
