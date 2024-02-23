@@ -3,15 +3,19 @@ package com.ptotakkanan.jurnalkas.data.repository
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.ptotakkanan.jurnalkas.data.Resource
 import com.ptotakkanan.jurnalkas.data.model.User
 import com.ptotakkanan.jurnalkas.data.util.FirebaseCollections
+import com.ptotakkanan.jurnalkas.domain.Transaction
 import com.ptotakkanan.jurnalkas.domain.Wallet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.tasks.await
@@ -23,7 +27,7 @@ class AppRepository {
     private val storage = FirebaseStorage.getInstance()
     private val currentUser = FirebaseAuth.getInstance().currentUser
 
-    suspend fun register(email: String, password: String): Flow<Resource<Unit>> = flow {
+    fun register(email: String, password: String): Flow<Resource<Unit>> = flow {
         emit(Resource.Loading())
         try {
             val authResult = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
@@ -56,7 +60,7 @@ class AppRepository {
         }
     }.flowOn(Dispatchers.IO)
 
-    suspend fun login(email: String, password: String): Flow<Resource<FirebaseUser>> = flow {
+    fun login(email: String, password: String): Flow<Resource<FirebaseUser>> = flow {
         emit(Resource.Loading())
         try {
             val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
@@ -71,7 +75,7 @@ class AppRepository {
         return currentUser != null
     }
 
-    suspend fun fetchWallets(): Flow<Resource<List<Wallet>>> = flow {
+    fun fetchWallets(): Flow<Resource<List<Wallet>>> = flow {
         emit(Resource.Loading())
         val walletList = mutableListOf<Wallet>()
         try {
@@ -82,7 +86,8 @@ class AppRepository {
                 val name = document.getString("name") ?: ""
                 val balance = document.getLong("balance") ?: 0L
 
-                val wallet = Wallet(walletId = walletId, name = name, icon = imageUrl, balance = balance)
+                val wallet =
+                    Wallet(walletId = walletId, name = name, icon = imageUrl, balance = balance)
                 walletList.add(wallet)
             }
             emit(Resource.Success(walletList.toList()))
@@ -91,4 +96,51 @@ class AppRepository {
             emit(Resource.Error(e.message))
         }
     }.flowOn(Dispatchers.IO)
+
+    fun addTransaction(transaction: Transaction): Flow<Resource<Unit>> = channelFlow {
+        updateWalletBalance(transaction).collectLatest { result ->
+            when (result) {
+                is Resource.Loading -> send(Resource.Loading())
+                is Resource.Error -> send(Resource.Error(result.message))
+                is Resource.Success -> {
+                    try {
+                        send(Resource.Loading())
+                        val documentRef = firestore.collection("transactions").add(transaction).await()
+                        val transactionId = documentRef.id
+                        val updatedTransaction = transaction.copy(transactionId = transactionId)
+                        documentRef.set(updatedTransaction).await()
+                        send(Resource.Success(Unit))
+                    } catch (e: FirebaseFirestoreException) {
+                        Log.d("Add Transaction", e.message.toString())
+                        send(Resource.Error(e.message))
+                    }
+
+                }
+            }
+        }
+
+    }
+
+    private fun updateWalletBalance(transaction: Transaction): Flow<Resource<Unit>> = flow {
+        try {
+            val walletDocRef =
+                firestore.collection(FirebaseCollections.WALLET).document(transaction.walletId)
+            val walletDoc = walletDocRef.get().await()
+
+            if (walletDoc.exists()) {
+                val currentBalance = walletDoc.getDouble("balance") ?: 0.0
+                val newBalance =
+                    if (transaction.isIncome)
+                        currentBalance + transaction.nominal
+                    else
+                        currentBalance - transaction.nominal
+                walletDocRef.update("balance", newBalance).await()
+                Log.d("Update Balance", "Success")
+            }
+            emit(Resource.Success(Unit))
+        } catch (e: FirebaseFirestoreException) {
+            Log.d("Update Balance", e.message.toString())
+            emit(Resource.Error(e.message))
+        }
+    }
 }

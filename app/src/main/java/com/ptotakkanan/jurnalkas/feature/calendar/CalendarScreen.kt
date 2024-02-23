@@ -204,7 +204,7 @@ fun CalendarScreen(
                     )
                 }
 
-                val groupedTransactions = viewModel.dummyTransaction.groupBy { it.date }
+               /* val groupedTransactions = viewModel.dummyTransaction.groupBy { it.date }
                 groupedTransactions.forEach { (date, transaction) ->
                     AppText(
                         text = date,
@@ -222,7 +222,7 @@ fun CalendarScreen(
                         )
                     }
                     Spacer(modifier = Modifier.height(12.dp))
-                }
+                }*/
             }
         }
     }

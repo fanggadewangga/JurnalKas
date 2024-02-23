@@ -135,7 +135,7 @@ fun WalletDetailScreen(
 
 
         // Transactions
-        LazyColumn {
+        /*LazyColumn {
             val groupedTransactions = viewModel.dummyTransaction.groupBy { it.date }
             groupedTransactions.forEach { (date, transaction) ->
                 item {
@@ -158,6 +158,6 @@ fun WalletDetailScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                 }
             }
-        }
+        }*/
     }
 }

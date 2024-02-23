@@ -18,3 +18,10 @@ fun String.convertDateFormat(fromFormat: DateFormat, toFormat: DateFormat): Stri
     val date = originalFormatter.parse(this)
     return targetFormatter.format(date!!)
 }
+
+fun createTimeStamp(format: DateFormat): String = run {
+    val date = java.util.Date()
+    val formatter = SimpleDateFormat(format.format, Locale("id", "ID"))
+    formatter.timeZone = java.util.TimeZone.getTimeZone("Asia/Jakarta")
+    formatter.format(date)
+}

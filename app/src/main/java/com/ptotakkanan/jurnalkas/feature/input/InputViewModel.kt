@@ -6,11 +6,17 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ptotakkanan.jurnalkas.R
+import com.ptotakkanan.jurnalkas.core.ext.createTimeStamp
 import com.ptotakkanan.jurnalkas.data.Resource
 import com.ptotakkanan.jurnalkas.data.repository.AppRepository
 import com.ptotakkanan.jurnalkas.domain.Category
+import com.ptotakkanan.jurnalkas.domain.Transaction
 import com.ptotakkanan.jurnalkas.domain.Wallet
+import com.ptotakkanan.jurnalkas.feature.util.date.DateFormat
 import com.ptotakkanan.jurnalkas.feature.util.state.SelectionOption
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class InputViewModel : ViewModel() {
@@ -46,10 +52,17 @@ class InputViewModel : ViewModel() {
 
     private val repository = AppRepository()
 
+    private val channel = Channel<UiEvent>()
+    val eventFlow = channel.receiveAsFlow()
+
     fun onEvent(event: InputEvent) {
         when (event) {
-            is InputEvent.EnterDescription -> {
-                _state.value = _state.value.copy(description = event.value)
+            is InputEvent.EnterIncomeDescription -> {
+                _state.value = _state.value.copy(incomeDescription = event.value)
+            }
+
+            is InputEvent.EnterOutcomeDescription -> {
+                _state.value = _state.value.copy(outcomeDescription = event.value)
             }
 
             is InputEvent.ChooseOutcomeCategory -> {
@@ -62,15 +75,23 @@ class InputViewModel : ViewModel() {
             is InputEvent.ChooseWalletCategory -> {
                 _state.value.wallet.forEach { it.selected = false }
                 _state.value.wallet.find { it.option == event.value.option }?.selected = true
-                _state.value = _state.value.copy(chosenOutcomeCategory = event.value.option.name)
+                _state.value = _state.value.copy(chosenWallet = event.value.option)
             }
 
-            is InputEvent.EnterDate -> {
-                _state.value = _state.value.copy(date = event.value)
+            is InputEvent.EnterIncomeDate -> {
+                _state.value = _state.value.copy(incomeDate = event.value)
             }
 
-            is InputEvent.EnterNominal -> {
-                _state.value = _state.value.copy(date = event.value)
+            is InputEvent.EnterOutcomeDate -> {
+                _state.value = _state.value.copy(outcomeDate = event.value)
+            }
+
+            is InputEvent.EnterIncomeNominal -> {
+                _state.value = _state.value.copy(incomeNominal = event.value)
+            }
+
+            is InputEvent.EnterOutcomeNominal -> {
+                _state.value = _state.value.copy(outcomeNominal = event.value)
             }
 
             is InputEvent.SwitchTab -> {
@@ -113,7 +134,67 @@ class InputViewModel : ViewModel() {
                     }
                 }
             }
+
+            InputEvent.AddIncome -> {
+                viewModelScope.launch {
+                    val transaction = Transaction(
+                        walletId = _state.value.chosenWallet?.walletId ?: "",
+                        title = _state.value.title,
+                        description = _state.value.incomeDescription,
+                        nominal = _state.value.incomeNominal.toLong(),
+                        isIncome = true,
+                        date = createTimeStamp(DateFormat.DATE)
+                    )
+                    repository.addTransaction(transaction).collectLatest { result ->
+                        when(result) {
+                            is Resource.Loading -> _state.value = _state.value.copy(isLoading = true)
+                            is Resource.Error -> {
+                                _state.value = _state.value.copy(isLoading = false)
+                                channel.send(UiEvent.ShowErrorToast(result.message ?: "Terjadi kesalahan"))
+                            }
+                            is Resource.Success -> {
+                                _state.value = _state.value.copy(isLoading = false)
+                                channel.send(UiEvent.ShowSuccessToast("Sukses menambahkan transaksi"))
+                            }
+                        }
+                    }
+                }
+            }
+
+            InputEvent.AddOutcome -> {
+                viewModelScope.launch {
+                    val transaction = Transaction(
+                        walletId = _state.value.chosenWallet?.walletId ?: "",
+                        description = _state.value.outcomeDescription,
+                        nominal = _state.value.outcomeNominal.toLong(),
+                        isIncome = false,
+                        date = createTimeStamp(DateFormat.DATE)
+                    )
+                    repository.addTransaction(transaction).collectLatest { result ->
+                        when(result) {
+                            is Resource.Loading -> _state.value = _state.value.copy(isLoading = true)
+                            is Resource.Error -> {
+                                _state.value = _state.value.copy(isLoading = false)
+                                channel.send(UiEvent.ShowErrorToast(result.message ?: "Terjadi kesalahan"))
+                            }
+                            is Resource.Success -> {
+                                _state.value = _state.value.copy(isLoading = false)
+                                channel.send(UiEvent.ShowSuccessToast("Sukses menambahkan transaksi"))
+                            }
+                        }
+                    }
+                }
+            }
+
+            is InputEvent.EnterTitle -> {
+                _state.value = _state.value.copy(title = event.value)
+            }
         }
+    }
+
+    sealed class UiEvent {
+        data class ShowErrorToast(val message: String): UiEvent()
+        data class ShowSuccessToast(val message: String): UiEvent()
     }
 
     init {

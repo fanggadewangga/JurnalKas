@@ -18,7 +18,7 @@ import androidx.navigation.NavController
 import com.ptotakkanan.jurnalkas.R
 import com.ptotakkanan.jurnalkas.feature.input.components.TabOptionItem
 import com.ptotakkanan.jurnalkas.feature.input.page.InputOutcomeScreen
-import com.ptotakkanan.jurnalkas.feature.input.page.WalletOptionScreen
+import com.ptotakkanan.jurnalkas.feature.input.page.InputIncomeScreen
 import com.ptotakkanan.jurnalkas.theme.blue50
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -68,6 +68,6 @@ fun InputScreen(
         if (viewModel.tabOptions.last().selected)
             InputOutcomeScreen(navController = navController, viewModel = viewModel, state = state)
         else
-            WalletOptionScreen(viewModel = viewModel, state = state)
+            InputIncomeScreen(viewModel = viewModel, state = state)
     }
 }

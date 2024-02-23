@@ -46,7 +46,7 @@ fun TransactionItem(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 AsyncImage(
-                    model = transaction.icon,
+                    model = transaction.imageUrl,
                     contentDescription = "Note icon",
                     modifier = Modifier.size(32.dp)
                 )

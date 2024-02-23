@@ -8,8 +8,12 @@ data class InputState(
     val isLoading: Boolean = false,
     val chosenOutcomeCategory: String = "",
     val chosenWallet: Wallet? = null,
-    val description: String = "",
-    val nominal: Long = 0,
-    val date: String = "Hari Ini",
+    val title: String = "",
+    val incomeDescription: String = "",
+    val outcomeDescription: String = "",
+    val incomeNominal: String = "0",
+    val outcomeNominal: String = "0",
+    val incomeDate: String = "Hari Ini",
+    val outcomeDate: String = "Hari Ini",
     val selectedTab: String = "Kategori"
 )

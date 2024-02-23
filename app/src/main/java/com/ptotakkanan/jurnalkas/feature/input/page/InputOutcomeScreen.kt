@@ -22,6 +22,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -29,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -41,20 +43,23 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.ptotakkanan.jurnalkas.R
 import com.ptotakkanan.jurnalkas.core.ext.convertDateFormat
-import com.ptotakkanan.jurnalkas.core.ext.toCurrency
 import com.ptotakkanan.jurnalkas.feature.category.components.CategoryItem
+import com.ptotakkanan.jurnalkas.feature.common.components.AppDialog
 import com.ptotakkanan.jurnalkas.feature.common.components.AppText
+import com.ptotakkanan.jurnalkas.feature.common.util.ObserveAsEvents
 import com.ptotakkanan.jurnalkas.feature.input.InputEvent
 import com.ptotakkanan.jurnalkas.feature.input.InputState
 import com.ptotakkanan.jurnalkas.feature.input.InputViewModel
 import com.ptotakkanan.jurnalkas.feature.input.components.CustomNumpad
 import com.ptotakkanan.jurnalkas.feature.util.date.DateFormat
 import com.ptotakkanan.jurnalkas.theme.Typography
+import com.ptotakkanan.jurnalkas.theme.primary10
 import com.ptotakkanan.jurnalkas.theme.primary20
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import es.dmoral.toasty.Toasty
 import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -63,6 +68,23 @@ import java.time.LocalDate
 fun InputOutcomeScreen(navController: NavController, viewModel: InputViewModel, state: InputState) {
 
     val calendarState = rememberMaterialDialogState()
+    val context = LocalContext.current
+
+    ObserveAsEvents(flow = viewModel.eventFlow) { event ->
+        when(event) {
+            is InputViewModel.UiEvent.ShowErrorToast -> Toasty.error(context, event.message).show()
+            is InputViewModel.UiEvent.ShowSuccessToast -> Toasty.success(context, event.message).show()
+        }
+    }
+
+    if (state.isLoading)
+        AppDialog(
+            dialogContent = { CircularProgressIndicator(color = primary10) },
+            setShowDialog = {},
+            onCancelClicked = {},
+            onConfirmClicked = {},
+            modifier = Modifier.size(120.dp)
+        )
 
     // Calendar Picker
     MaterialDialog(
@@ -111,7 +133,7 @@ fun InputOutcomeScreen(navController: NavController, viewModel: InputViewModel, 
             }
         ) {
             viewModel.onEvent(
-                InputEvent.EnterDate(
+                InputEvent.EnterOutcomeDate(
                     it.toString().convertDateFormat(DateFormat.DEFAULT, DateFormat.FRONTEND_DATE)
                 )
             )
@@ -223,8 +245,8 @@ fun InputOutcomeScreen(navController: NavController, viewModel: InputViewModel, 
             )
             Spacer(modifier = Modifier.height(12.dp))
             BasicTextField(
-                value = state.description,
-                onValueChange = { viewModel.onEvent(InputEvent.EnterDescription(it)) },
+                value = state.outcomeDescription,
+                onValueChange = { viewModel.onEvent(InputEvent.EnterOutcomeDescription(it)) },
                 textStyle = TextStyle(
                     fontFamily = FontFamily(Font(R.font.raleway_bold)),
                     fontSize = 12.sp,
@@ -246,8 +268,8 @@ fun InputOutcomeScreen(navController: NavController, viewModel: InputViewModel, 
             )
             Spacer(modifier = Modifier.height(12.dp))
             BasicTextField(
-                value = state.nominal.toCurrency(),
-                onValueChange = { viewModel.onEvent(InputEvent.EnterNominal(it)) },
+                value = state.outcomeNominal,
+                onValueChange = { viewModel.onEvent(InputEvent.EnterOutcomeNominal(it)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 textStyle = TextStyle(
                     fontFamily = FontFamily(Font(R.font.raleway_bold)),
@@ -273,7 +295,7 @@ fun InputOutcomeScreen(navController: NavController, viewModel: InputViewModel, 
                         modifier = Modifier.size(24.dp)
                     )
                     AppText(
-                        text = state.date,
+                        text = state.outcomeDate,
                         textStyle = TextStyle(
                             fontFamily = FontFamily(Font(R.font.raleway_bold)),
                             fontSize = 10.sp
@@ -303,7 +325,7 @@ fun InputOutcomeScreen(navController: NavController, viewModel: InputViewModel, 
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = rememberRipple(color = Color.White),
-                                onClick = { viewModel.onEvent(InputEvent.EnterNominal(".")) }
+                                onClick = { viewModel.onEvent(InputEvent.EnterOutcomeNominal(".")) }
                             )
                     ) {
                         Box(
@@ -324,7 +346,7 @@ fun InputOutcomeScreen(navController: NavController, viewModel: InputViewModel, 
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = rememberRipple(color = Color.White),
-                                onClick = { viewModel.onEvent(InputEvent.EnterNominal("0")) }
+                                onClick = { viewModel.onEvent(InputEvent.EnterOutcomeNominal("0")) }
                             )
                     ) {
                         Box(
@@ -366,7 +388,11 @@ fun InputOutcomeScreen(navController: NavController, viewModel: InputViewModel, 
                     model = R.drawable.ic_check,
                     contentDescription = "Check icon",
                     colorFilter = ColorFilter.tint(primary20),
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable {
+                            viewModel.onEvent(InputEvent.AddOutcome)
+                        }
                 )
             }
         }
