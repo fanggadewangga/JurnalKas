@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -32,12 +33,14 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.ptotakkanan.jurnalkas.R
 import com.ptotakkanan.jurnalkas.feature.common.components.AppButton
+import com.ptotakkanan.jurnalkas.feature.common.components.AppDialog
 import com.ptotakkanan.jurnalkas.feature.common.components.AppText
 import com.ptotakkanan.jurnalkas.feature.profile.ProfileEvent
 import com.ptotakkanan.jurnalkas.feature.profile.ProfileState
 import com.ptotakkanan.jurnalkas.feature.profile.ProfileViewModel
 import com.ptotakkanan.jurnalkas.feature.profile.components.EditableProfileItem
 import com.ptotakkanan.jurnalkas.theme.Typography
+import com.ptotakkanan.jurnalkas.theme.primary10
 import com.ptotakkanan.jurnalkas.theme.secondary10
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,6 +51,15 @@ fun EditableProfileScreen(
 ) {
 
     var expanded by remember { mutableStateOf(false) }
+
+    if (state.isLoading)
+        AppDialog(
+            dialogContent = { CircularProgressIndicator(color = primary10) },
+            setShowDialog = {},
+            onCancelClicked = {},
+            onConfirmClicked = {},
+            modifier = Modifier.size(120.dp)
+        )
 
     Spacer(modifier = Modifier.height(24.dp))
     Box(contentAlignment = Alignment.Center) {

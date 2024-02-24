@@ -126,4 +126,8 @@ class ProfileViewModel : ViewModel() {
         data object SwitchToEditable : UiEvent()
         data class ShowErrorMessage(val message: String) : UiEvent()
     }
+
+    init {
+        onEvent(ProfileEvent.FetchProfile)
+    }
 }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.ptotakkanan.jurnalkas.R
+import com.ptotakkanan.jurnalkas.feature.common.components.AppDialog
 import com.ptotakkanan.jurnalkas.feature.common.components.AppText
 import com.ptotakkanan.jurnalkas.feature.profile.ProfileEvent
 import com.ptotakkanan.jurnalkas.feature.profile.ProfileState
@@ -32,6 +34,7 @@ import com.ptotakkanan.jurnalkas.feature.profile.ProfileViewModel
 import com.ptotakkanan.jurnalkas.feature.profile.components.ViewOnlyProfileItem
 import com.ptotakkanan.jurnalkas.theme.Typography
 import com.ptotakkanan.jurnalkas.theme.blue10
+import com.ptotakkanan.jurnalkas.theme.primary10
 import com.ptotakkanan.jurnalkas.theme.primary20
 
 @Composable
@@ -39,6 +42,16 @@ fun ViewOnlyProfileScreen(
     viewModel: ProfileViewModel,
     state: ProfileState,
 ) {
+
+    if (state.isLoading)
+        AppDialog(
+            dialogContent = { CircularProgressIndicator(color = primary10) },
+            setShowDialog = {},
+            onCancelClicked = {},
+            onConfirmClicked = {},
+            modifier = Modifier.size(120.dp)
+        )
+
     Spacer(modifier = Modifier.height(32.dp))
     AppText(
         text = "Profile",
