@@ -1,4 +1,4 @@
-package com.ptotakkanan.jurnalkas.feature.calendar
+package com.ptotakkanan.jurnalkas.feature.calendar.calendar
 
 import android.widget.CalendarView
 import androidx.compose.foundation.background
@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -205,7 +204,9 @@ fun CalendarScreen(
                         elevation = CardDefaults.cardElevation(8.dp),
                         shape = RoundedCornerShape(32.dp),
                         colors = CardDefaults.cardColors(containerColor = Color.White),
-                        modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 24.dp)
+                        modifier = Modifier
+                            .padding(start = 24.dp, end = 24.dp, bottom = 24.dp)
+                            .clickable { navController.navigate(Screen.CalendarDetail.route) }
                     ) {
                         AndroidView(
                             factory = {

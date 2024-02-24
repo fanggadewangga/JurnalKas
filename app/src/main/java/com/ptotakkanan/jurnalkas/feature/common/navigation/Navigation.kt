@@ -7,7 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ptotakkanan.jurnalkas.feature.analysis.AnalysisScreen
-import com.ptotakkanan.jurnalkas.feature.calendar.CalendarScreen
+import com.ptotakkanan.jurnalkas.feature.calendar.calendar.CalendarScreen
 import com.ptotakkanan.jurnalkas.feature.calendar.detail.CalendarDetailScreen
 import com.ptotakkanan.jurnalkas.feature.category.detail.CategoryDetailScreen
 import com.ptotakkanan.jurnalkas.feature.category.categories.CategoryScreen

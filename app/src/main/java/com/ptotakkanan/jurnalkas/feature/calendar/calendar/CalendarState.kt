@@ -1,4 +1,4 @@
-package com.ptotakkanan.jurnalkas.feature.calendar
+package com.ptotakkanan.jurnalkas.feature.calendar.calendar
 
 import com.ptotakkanan.jurnalkas.domain.Transaction
 

@@ -15,9 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ptotakkanan.jurnalkas.core.ext.convertDateFormat
 import com.ptotakkanan.jurnalkas.core.ext.toCurrency
-import com.ptotakkanan.jurnalkas.domain.CalendarTransaction
+import com.ptotakkanan.jurnalkas.domain.Transaction
 import com.ptotakkanan.jurnalkas.feature.common.components.AppText
+import com.ptotakkanan.jurnalkas.feature.util.date.DateFormat
 import com.ptotakkanan.jurnalkas.theme.Typography
 import com.ptotakkanan.jurnalkas.theme.green20
 import com.ptotakkanan.jurnalkas.theme.primary20
@@ -26,7 +28,7 @@ import com.ptotakkanan.jurnalkas.theme.secondary10
 @Composable
 fun CalendarTransactionItem(
     modifier: Modifier = Modifier,
-    calendarTransaction: CalendarTransaction,
+    transaction: Transaction,
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = primary20),
@@ -41,12 +43,12 @@ fun CalendarTransactionItem(
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             AppText(
-                text = calendarTransaction.month,
+                text = transaction.date.convertDateFormat(DateFormat.DATE, DateFormat.MONTH),
                 textStyle = Typography.titleMedium().copy(fontSize = 16.sp),
                 color = Color.White
             )
             AppText(
-                text = calendarTransaction.date,
+                text = transaction.date.convertDateFormat(DateFormat.DATE, DateFormat.CALENDAR_DETAIL_TRANSACTION),
                 textStyle = Typography.titleMedium().copy(fontSize = 12.sp),
                 color = Color.Gray
             )
@@ -69,9 +71,9 @@ fun CalendarTransactionItem(
                     color = Color.White
                 )
                 AppText(
-                    text = if (calendarTransaction.isSuccess) "Sukses" else "Gagal",
+                    text = "Sukses",
                     textStyle = Typography.titleSmall().copy(fontSize = 12.sp),
-                    color = if (calendarTransaction.isSuccess) green20 else Color.Red
+                    color = green20
                 )
             }
             Row(
@@ -84,7 +86,7 @@ fun CalendarTransactionItem(
                     color = Color.Gray
                 )
                 AppText(
-                    text = calendarTransaction.nominal.toCurrency(),
+                    text = transaction.nominal.toCurrency(),
                     textStyle = Typography.titleSmall().copy(fontSize = 12.sp),
                     color = secondary10
                 )

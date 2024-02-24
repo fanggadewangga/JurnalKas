@@ -18,10 +18,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -34,9 +36,11 @@ import coil.compose.AsyncImage
 import com.ptotakkanan.jurnalkas.R
 import com.ptotakkanan.jurnalkas.feature.calendar.components.CalendarTransactionItem
 import com.ptotakkanan.jurnalkas.feature.common.components.AppText
+import com.ptotakkanan.jurnalkas.feature.common.util.ObserveAsEvents
 import com.ptotakkanan.jurnalkas.theme.Typography
 import com.ptotakkanan.jurnalkas.theme.primary20
 import com.ptotakkanan.jurnalkas.theme.secondary0
+import es.dmoral.toasty.Toasty
 
 @Composable
 fun CalendarDetailScreen(
@@ -44,6 +48,18 @@ fun CalendarDetailScreen(
     viewModel: CalendarDetailViewModel = viewModel(),
     screenWidth: Int,
 ) {
+
+    val state by viewModel.state
+    val context = LocalContext.current
+
+    ObserveAsEvents(flow = viewModel.eventFlow) { event ->
+        when(event) {
+            is CalendarDetailViewModel.UiEvent.ShowErrorToast -> Toasty.error(context, event.message).show()
+            CalendarDetailViewModel.UiEvent.ShowIncome -> viewModel.onEvent(CalendarDetailEvent.FetchTransaction(true))
+            CalendarDetailViewModel.UiEvent.ShowOutcome -> viewModel.onEvent(CalendarDetailEvent.FetchTransaction(false))
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -54,7 +70,9 @@ fun CalendarDetailScreen(
                 model = R.drawable.ic_arrow_left,
                 contentDescription = "Arrow back",
                 colorFilter = ColorFilter.tint(primary20),
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable { navController.popBackStack() }
             )
             AppText(
                 text = "Detail Kalender",
@@ -125,12 +143,8 @@ fun CalendarDetailScreen(
         // Transaction Item
         Spacer(modifier = Modifier.height(24.dp))
         LazyColumn {
-            val items = if (viewModel.options.first().selected)
-                viewModel.dummyIncome
-            else
-                viewModel.dummyOutcome
-            items(items) { item ->
-                CalendarTransactionItem(calendarTransaction = item)
+            items(state.transactions) { item ->
+                CalendarTransactionItem(transaction = item)
             }
         }
     }

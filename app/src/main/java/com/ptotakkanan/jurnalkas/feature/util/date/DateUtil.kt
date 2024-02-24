@@ -8,5 +8,6 @@ enum class DateFormat(val format: String) {
     DAY_DATE_TIME("${DAY_DATE.format}, HH:mm"),
     FRONTEND_DATE("MM/dd/yyy"),
     DEFAULT("yyyy-MM-dd"),
-    MONTH("MMMM")
+    MONTH("MMMM"),
+    CALENDAR_DETAIL_TRANSACTION("dd/MM/yyyy")
 }

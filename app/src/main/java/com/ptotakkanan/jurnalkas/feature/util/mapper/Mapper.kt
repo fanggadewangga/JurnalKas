@@ -50,6 +50,6 @@ object Mapper{
         title = getString("title") ?: "",
         imageUrl = getString("imageUrl") ?: "",
         nominal = getLong("nominal") ?: 0,
-        isIncome = getBoolean("isIncome") ?: false
+        isIncome = getBoolean("income") ?: false
     )
 }
