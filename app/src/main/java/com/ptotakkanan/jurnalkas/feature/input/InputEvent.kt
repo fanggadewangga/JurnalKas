@@ -20,4 +20,5 @@ sealed class InputEvent {
     data object FetchWallets: InputEvent()
     data object AddIncome: InputEvent()
     data object AddOutcome: InputEvent()
+    data object FetchOutcomeCategories: InputEvent()
 }

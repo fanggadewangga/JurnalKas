@@ -1,5 +1,6 @@
-package com.ptotakkanan.jurnalkas.feature.category.components
+package com.ptotakkanan.jurnalkas.feature.input.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,16 +22,19 @@ import coil.compose.AsyncImage
 import com.ptotakkanan.jurnalkas.domain.Category
 import com.ptotakkanan.jurnalkas.feature.common.components.AppText
 import com.ptotakkanan.jurnalkas.theme.Typography
+import com.ptotakkanan.jurnalkas.theme.primary20
 
 @Composable
-fun CategoryItem(
+fun OutcomeCategoryItem(
     modifier: Modifier = Modifier,
     category: Category,
+    selected: Boolean = false
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(4.dp),
+        border = if (selected) BorderStroke(width = 2.dp, color = primary20) else null,
         modifier = modifier
     ) {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {

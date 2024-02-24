@@ -19,14 +19,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.ptotakkanan.jurnalkas.feature.category.CategoryEvent
-import com.ptotakkanan.jurnalkas.feature.category.detail.CategoryViewModel
-import com.ptotakkanan.jurnalkas.feature.category.components.CategoryItem
+import androidx.navigation.NavController
+import com.ptotakkanan.jurnalkas.feature.category.categories.CategoryViewModel
+import com.ptotakkanan.jurnalkas.feature.category.components.MoreCategoryItem
+import com.ptotakkanan.jurnalkas.feature.common.route.Screen
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun SecondCategoryScreen(
+    navController: NavController,
     pagerState: PagerState,
     viewModel: CategoryViewModel,
 ) {
@@ -44,16 +46,27 @@ fun SecondCategoryScreen(
         modifier = Modifier.fillMaxWidth()
     ) {
         viewModel.moreCategory.forEach { category ->
-            CategoryItem(
-                name = category.option.category,
-                icon = category.option.icon,
-                selected = category.selected,
+            MoreCategoryItem(
+                name = category.option.name,
+                icon = category.option.image,
                 modifier = Modifier
                     .size(90.dp)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = rememberRipple(color = Color.White),
-                        onClick = { viewModel.onEvent(CategoryEvent.AddMoreCategory(category)) }
+                        onClick = {
+                            when(category.option.name) {
+                                "Profil" -> navController.navigate(Screen.Profile.route)
+                                "Book" -> {}
+                                "Dompet" -> {}
+                                "Cari" -> navController.navigate(Screen.Note.route)
+                                "Pengingat" -> {}
+                                "Kategori" -> {}
+                                "Tentang" -> {}
+                                "Google Drive" -> {}
+                                "Premium" -> {}
+                            }
+                        }
                     )
             )
         }

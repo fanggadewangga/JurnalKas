@@ -6,5 +6,8 @@ import com.ptotakkanan.jurnalkas.feature.util.state.SelectionOption
 sealed class AddCategoryEvent {
     data class EnterCategory(val value: String): AddCategoryEvent()
     data class EnterDescription(val value: String): AddCategoryEvent()
-    data class ChooseCategory(val value: SelectionOption<Int>): AddCategoryEvent()
+    data class EnterExample(val value: String): AddCategoryEvent()
+    data class ChooseCategory(val value: SelectionOption<String>): AddCategoryEvent()
+    data object FetchImageOptions: AddCategoryEvent()
+    data object AddNewCategory: AddCategoryEvent()
 }

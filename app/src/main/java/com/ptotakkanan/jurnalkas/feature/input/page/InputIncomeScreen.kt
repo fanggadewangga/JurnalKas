@@ -218,7 +218,7 @@ fun InputIncomeScreen(
                                 colorFilter = ColorFilter.tint(primary20)
                             )
                             AppText(
-                                text = state.chosenOutcomeCategory,
+                                text = state.chosenOutcomeCategory?.name ?: "",
                                 textStyle = Typography.titleSmall().copy(fontSize = 12.sp),
                                 color = primary20
                             )

@@ -24,6 +24,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -43,12 +45,15 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.ptotakkanan.jurnalkas.R
 import com.ptotakkanan.jurnalkas.feature.common.components.AppButton
+import com.ptotakkanan.jurnalkas.feature.common.components.AppDialog
 import com.ptotakkanan.jurnalkas.feature.common.components.AppText
+import com.ptotakkanan.jurnalkas.feature.common.util.ObserveAsEvents
 import com.ptotakkanan.jurnalkas.theme.Typography
 import com.ptotakkanan.jurnalkas.theme.blue50
 import com.ptotakkanan.jurnalkas.theme.primary10
 import com.ptotakkanan.jurnalkas.theme.primary20
 import com.ptotakkanan.jurnalkas.theme.secondary10
+import es.dmoral.toasty.Toasty
 
 @Composable
 fun AddCategoryScreen(
@@ -57,6 +62,23 @@ fun AddCategoryScreen(
 ) {
 
     val state by viewModel.state
+    val context = LocalContext.current
+
+    ObserveAsEvents(flow = viewModel.eventFlow) { event ->
+        when(event) {
+            is AddCategoryViewModel.UiEvent.ShowSuccessToast -> Toasty.success(context, event.message).show()
+            is AddCategoryViewModel.UiEvent.ShowErrorToast -> Toasty.error(context, event.message).show()
+        }
+    }
+
+    if (state.isLoading)
+        AppDialog(
+            dialogContent = { CircularProgressIndicator(color = primary10) },
+            setShowDialog = {},
+            onCancelClicked = {},
+            onConfirmClicked = {},
+            modifier = Modifier.size(120.dp)
+        )
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -155,11 +177,34 @@ fun AddCategoryScreen(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Divider(color = Color.LightGray, modifier = Modifier.fillMaxWidth())
+
+                Spacer(modifier = Modifier.height(12.dp))
+                AppText(
+                    text = "Contoh",
+                    textStyle = TextStyle(
+                        fontFamily = FontFamily(Font(R.font.raleway)),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight(500)
+                    ),
+                    color = Color(0xFF003566)
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                BasicTextField(
+                    value = state.example,
+                    onValueChange = { viewModel.onEvent(AddCategoryEvent.EnterExample(it)) },
+                    textStyle = TextStyle(
+                        fontFamily = FontFamily(Font(R.font.raleway_bold)),
+                        fontSize = 12.sp,
+                        color = Color(0xFF003566)
+                    )
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Divider(color = Color.LightGray, modifier = Modifier.fillMaxWidth())
             }
 
 
             LazyRow(modifier = Modifier.padding(horizontal = 24.dp)) {
-                items(viewModel.iconOption) { item ->
+                items(state.imageOptions) { item ->
                     Card(
                         shape = RoundedCornerShape(8.dp),
                         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -198,9 +243,7 @@ fun AddCategoryScreen(
                     .padding(vertical = 16.dp)
             ) {
                 AppButton(
-                    onClick = {
-
-                    },
+                    onClick = { viewModel.onEvent(AddCategoryEvent.AddNewCategory) },
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
                         .size(40.dp),

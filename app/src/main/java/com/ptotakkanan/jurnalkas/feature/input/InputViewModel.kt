@@ -5,13 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ptotakkanan.jurnalkas.R
 import com.ptotakkanan.jurnalkas.core.ext.createTimeStamp
 import com.ptotakkanan.jurnalkas.data.Resource
 import com.ptotakkanan.jurnalkas.data.repository.AppRepository
 import com.ptotakkanan.jurnalkas.domain.Category
 import com.ptotakkanan.jurnalkas.domain.Transaction
 import com.ptotakkanan.jurnalkas.domain.Wallet
+import com.ptotakkanan.jurnalkas.feature.util.constant.Constant
 import com.ptotakkanan.jurnalkas.feature.util.date.DateFormat
 import com.ptotakkanan.jurnalkas.feature.util.state.SelectionOption
 import kotlinx.coroutines.channels.Channel
@@ -20,20 +20,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class InputViewModel : ViewModel() {
-
-    private val _outcomeCategories = listOf(
-        SelectionOption(Category("Makan", R.drawable.ic_food), true),
-        SelectionOption(Category("Jajan", R.drawable.ic_snack), false),
-        SelectionOption(Category("Harian", R.drawable.ic_broom), false),
-        SelectionOption(Category("Lalu Lintas", R.drawable.ic_traffic), false),
-        SelectionOption(Category("Hadiah", R.drawable.ic_gift), false),
-        SelectionOption(Category("Rumah", R.drawable.ic_house), false),
-        SelectionOption(Category("Pendidikan", R.drawable.ic_education), false),
-        SelectionOption(Category("Hiburan", R.drawable.ic_entertaiment), false),
-    ).toMutableStateList()
-
-    val outcomeCategories: List<SelectionOption<Category>>
-        get() = _outcomeCategories
 
     private val _tabOptions = listOf(
         SelectionOption("Dompet", false),
@@ -66,10 +52,11 @@ class InputViewModel : ViewModel() {
             }
 
             is InputEvent.ChooseOutcomeCategory -> {
-                _outcomeCategories.forEach { it.selected = false }
-                _outcomeCategories.find { it.option == event.value.option }?.selected = true
-                _state.value =
-                    _state.value.copy(chosenOutcomeCategory = event.value.option.category)
+                _state.value.outcomeCategories.apply {
+                    forEach { it.selected = false }
+                    find { it.option == event.value.option }?.selected = true
+                }
+                _state.value = _state.value.copy(chosenOutcomeCategory = event.value.option)
             }
 
             is InputEvent.ChooseWalletCategory -> {
@@ -143,7 +130,8 @@ class InputViewModel : ViewModel() {
                         description = _state.value.incomeDescription,
                         nominal = _state.value.incomeNominal.toLong(),
                         isIncome = true,
-                        date = createTimeStamp(DateFormat.DATE)
+                        date = createTimeStamp(DateFormat.DATE),
+                        imageUrl = Constant.DEFAULT_INCOME_IMAGE
                     )
                     repository.addTransaction(transaction).collectLatest { result ->
                         when(result) {
@@ -165,10 +153,12 @@ class InputViewModel : ViewModel() {
                 viewModelScope.launch {
                     val transaction = Transaction(
                         walletId = _state.value.chosenWallet?.walletId ?: "",
+                        title = _state.value.chosenOutcomeCategory?.name ?: "",
                         description = _state.value.outcomeDescription,
                         nominal = _state.value.outcomeNominal.toLong(),
                         isIncome = false,
-                        date = createTimeStamp(DateFormat.DATE)
+                        date = createTimeStamp(DateFormat.DATE),
+                        imageUrl = _state.value.chosenOutcomeCategory?.imageUrl ?: ""
                     )
                     repository.addTransaction(transaction).collectLatest { result ->
                         when(result) {
@@ -189,6 +179,36 @@ class InputViewModel : ViewModel() {
             is InputEvent.EnterTitle -> {
                 _state.value = _state.value.copy(title = event.value)
             }
+
+            InputEvent.FetchOutcomeCategories -> viewModelScope.launch {
+                repository.fetchCategories().collectLatest { result ->
+                    when (result) {
+                        is Resource.Loading -> _state.value = _state.value.copy(isLoading = true)
+                        is Resource.Error -> {
+                            _state.value = _state.value.copy(isLoading = true)
+                            channel.send(
+                                UiEvent.ShowErrorToast(
+                                    result.message ?: "Terjadi Kesalahan"
+                                )
+                            )
+                        }
+
+                        is Resource.Success -> {
+                            val selectionOptions = mutableStateListOf<SelectionOption<Category>>()
+                            result.data?.forEach { category ->
+                                if (category == result.data.first())
+                                    selectionOptions.add(SelectionOption(category, true))
+                                else
+                                    selectionOptions.add(SelectionOption(category, false))
+                            }
+                            _state.value = _state.value.copy(
+                                isLoading = false,
+                                outcomeCategories = selectionOptions
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -199,5 +219,6 @@ class InputViewModel : ViewModel() {
 
     init {
         onEvent(InputEvent.FetchWallets)
+        onEvent(InputEvent.FetchOutcomeCategories)
     }
 }

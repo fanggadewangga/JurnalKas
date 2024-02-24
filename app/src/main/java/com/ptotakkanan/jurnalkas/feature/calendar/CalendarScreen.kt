@@ -104,11 +104,8 @@ fun CalendarScreen(
                         selectedTint = primary20,
                         unselectedTint = Color.White,
                         onSelect = {
-                            viewModel.tabOptions.apply {
-                                first().selected = true
-                                last().selected = false
-                            }
-                        }
+                            viewModel.onEvent(CalendarEvent.SwitchTab(viewModel.tabOptions.first()))
+                        },
                     )
                     TabOptionItem(
                         title = viewModel.tabOptions.last().option,
@@ -119,10 +116,7 @@ fun CalendarScreen(
                         selectedTint = primary20,
                         unselectedTint = Color.White,
                         onSelect = {
-                            viewModel.tabOptions.apply {
-                                first().selected = false
-                                last().selected = true
-                            }
+                            viewModel.onEvent(CalendarEvent.SwitchTab(viewModel.tabOptions.last()))
                         },
                     )
                 }
@@ -132,7 +126,7 @@ fun CalendarScreen(
                     modifier = Modifier
                         .size(24.dp)
                         .clickable {
-                            navController.navigate(Screen.Profile.route)
+                            navController.navigate(Screen.Category.route)
                         }
                 )
             }
@@ -202,13 +196,14 @@ fun CalendarScreen(
                 modifier = Modifier.fillMaxHeight()
             ) {
 
+                Spacer(modifier = Modifier.height(24.dp))
                 // Calendar
                 if (state.selectedTab == viewModel.tabOptions.first().option)
                     Card(
                         elevation = CardDefaults.cardElevation(8.dp),
                         shape = RoundedCornerShape(32.dp),
                         colors = CardDefaults.cardColors(containerColor = Color.White),
-                        modifier = Modifier.padding(24.dp)
+                        modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 24.dp)
                     ) {
                         AndroidView(
                             factory = {

@@ -10,7 +10,7 @@ import com.ptotakkanan.jurnalkas.feature.analysis.AnalysisScreen
 import com.ptotakkanan.jurnalkas.feature.calendar.CalendarScreen
 import com.ptotakkanan.jurnalkas.feature.calendar.detail.CalendarDetailScreen
 import com.ptotakkanan.jurnalkas.feature.category.detail.CategoryDetailScreen
-import com.ptotakkanan.jurnalkas.feature.category.CategoryScreen
+import com.ptotakkanan.jurnalkas.feature.category.categories.CategoryScreen
 import com.ptotakkanan.jurnalkas.feature.category.add.AddCategoryScreen
 import com.ptotakkanan.jurnalkas.feature.common.route.Screen
 import com.ptotakkanan.jurnalkas.feature.input.InputScreen

@@ -48,7 +48,6 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.ptotakkanan.jurnalkas.R
 import com.ptotakkanan.jurnalkas.core.ext.convertDateFormat
-import com.ptotakkanan.jurnalkas.feature.category.components.CategoryItem
 import com.ptotakkanan.jurnalkas.feature.common.components.AppDialog
 import com.ptotakkanan.jurnalkas.feature.common.components.AppText
 import com.ptotakkanan.jurnalkas.feature.common.navigation.BottomNavigationBar
@@ -57,6 +56,7 @@ import com.ptotakkanan.jurnalkas.feature.input.InputEvent
 import com.ptotakkanan.jurnalkas.feature.input.InputState
 import com.ptotakkanan.jurnalkas.feature.input.InputViewModel
 import com.ptotakkanan.jurnalkas.feature.input.components.CustomNumpad
+import com.ptotakkanan.jurnalkas.feature.input.components.OutcomeCategoryItem
 import com.ptotakkanan.jurnalkas.feature.util.date.DateFormat
 import com.ptotakkanan.jurnalkas.theme.Typography
 import com.ptotakkanan.jurnalkas.theme.blue50
@@ -174,17 +174,22 @@ fun InputOutcomeScreen(navController: NavController, viewModel: InputViewModel, 
                 maxItemsInEachRow = 3,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                viewModel.outcomeCategories.forEach { category ->
-                    CategoryItem(
-                        name = category.option.category,
-                        icon = category.option.icon,
+                state.outcomeCategories.forEach { category ->
+                    OutcomeCategoryItem(
+                        category = category.option,
                         selected = category.selected,
                         modifier = Modifier
                             .size(90.dp)
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = rememberRipple(color = Color.White),
-                                onClick = { viewModel.onEvent(InputEvent.ChooseOutcomeCategory(category)) }
+                                onClick = {
+                                    viewModel.onEvent(
+                                        InputEvent.ChooseOutcomeCategory(
+                                            category
+                                        )
+                                    )
+                                }
                             )
                     )
                 }
@@ -236,7 +241,7 @@ fun InputOutcomeScreen(navController: NavController, viewModel: InputViewModel, 
                                 colorFilter = ColorFilter.tint(primary20)
                             )
                             AppText(
-                                text = state.chosenOutcomeCategory,
+                                text = state.chosenOutcomeCategory?.name ?: "",
                                 textStyle = Typography.titleSmall().copy(fontSize = 12.sp),
                                 color = primary20
                             )
@@ -246,7 +251,7 @@ fun InputOutcomeScreen(navController: NavController, viewModel: InputViewModel, 
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             AsyncImage(
-                                model = state.chosenWallet,
+                                model = state.chosenWallet?.icon ?: "",
                                 contentDescription = "Category box",
                                 colorFilter = ColorFilter.tint(primary20),
                                 modifier = Modifier.size(16.dp)
@@ -352,7 +357,13 @@ fun InputOutcomeScreen(navController: NavController, viewModel: InputViewModel, 
                                     .clickable(
                                         interactionSource = remember { MutableInteractionSource() },
                                         indication = rememberRipple(color = Color.White),
-                                        onClick = { viewModel.onEvent(InputEvent.EnterOutcomeNominal(".")) }
+                                        onClick = {
+                                            viewModel.onEvent(
+                                                InputEvent.EnterOutcomeNominal(
+                                                    "."
+                                                )
+                                            )
+                                        }
                                     )
                             ) {
                                 Box(
@@ -373,7 +384,13 @@ fun InputOutcomeScreen(navController: NavController, viewModel: InputViewModel, 
                                     .clickable(
                                         interactionSource = remember { MutableInteractionSource() },
                                         indication = rememberRipple(color = Color.White),
-                                        onClick = { viewModel.onEvent(InputEvent.EnterOutcomeNominal("0")) }
+                                        onClick = {
+                                            viewModel.onEvent(
+                                                InputEvent.EnterOutcomeNominal(
+                                                    "0"
+                                                )
+                                            )
+                                        }
                                     )
                             ) {
                                 Box(

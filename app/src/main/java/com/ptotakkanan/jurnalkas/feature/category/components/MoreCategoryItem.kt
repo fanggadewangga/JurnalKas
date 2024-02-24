@@ -1,5 +1,6 @@
 package com.ptotakkanan.jurnalkas.feature.category.components
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,14 +19,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.ptotakkanan.jurnalkas.domain.Category
 import com.ptotakkanan.jurnalkas.feature.common.components.AppText
 import com.ptotakkanan.jurnalkas.theme.Typography
 
 @Composable
-fun CategoryItem(
+fun MoreCategoryItem(
     modifier: Modifier = Modifier,
-    category: Category,
+    name: String,
+    @DrawableRes icon: Int,
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -42,12 +43,12 @@ fun CategoryItem(
                     .padding(horizontal = 6.dp, vertical = 8.dp)
             ) {
                 AsyncImage(
-                    model = category.imageUrl,
-                    contentDescription = "${category.name} icon",
+                    model = icon,
+                    contentDescription = "$name con",
                     modifier = Modifier.size(40.dp)
                 )
                 AppText(
-                    text = category.name,
+                    text = name,
                     textStyle = Typography.bodyMedium()
                         .copy(fontSize = 12.sp, fontWeight = FontWeight(600)),
                 )

@@ -1,5 +1,6 @@
 package com.ptotakkanan.jurnalkas.feature.calendar
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
@@ -36,6 +37,7 @@ class CalendarViewModel : ViewModel() {
                 _tabOptions.forEach { it.selected = false }
                 _tabOptions.find { it.option == event.value.option }?.selected = true
                 _state.value = _state.value.copy(selectedTab = event.value.option)
+                Log.d("Selected Tab", event.value.option)
             }
 
             CalendarEvent.FetchTransactions -> viewModelScope.launch {

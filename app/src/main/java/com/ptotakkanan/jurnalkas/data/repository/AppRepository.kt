@@ -10,9 +10,11 @@ import com.google.firebase.storage.FirebaseStorage
 import com.ptotakkanan.jurnalkas.data.Resource
 import com.ptotakkanan.jurnalkas.data.model.User
 import com.ptotakkanan.jurnalkas.data.util.FirebaseCollections
+import com.ptotakkanan.jurnalkas.domain.Category
 import com.ptotakkanan.jurnalkas.domain.Transaction
 import com.ptotakkanan.jurnalkas.domain.Wallet
 import com.ptotakkanan.jurnalkas.domain.WalletDetail
+import com.ptotakkanan.jurnalkas.feature.util.mapper.Mapper.toCategory
 import com.ptotakkanan.jurnalkas.feature.util.mapper.Mapper.toTransaction
 import com.ptotakkanan.jurnalkas.feature.util.mapper.Mapper.toUser
 import com.ptotakkanan.jurnalkas.feature.util.mapper.Mapper.toWallet
@@ -237,6 +239,73 @@ class AppRepository {
             emit(Resource.Success(Unit))
         } catch (e: FirebaseFirestoreException) {
             Log.d("Update User", e.message.toString())
+            emit(Resource.Error(e.message))
+        }
+    }
+
+    fun addNewCategory(body: com.ptotakkanan.jurnalkas.data.model.Category): Flow<Resource<Unit>> =
+        flow {
+            emit(Resource.Loading())
+            try {
+                val documentRef = firestore.collection(FirebaseCollections.CATEGORY)
+                    .add(body)
+                    .await()
+                val categoryId = documentRef.id
+                val updatedBody = body.copy(categoryId = categoryId)
+                documentRef.set(updatedBody).await()
+                emit(Resource.Success(Unit))
+            } catch (e: FirebaseFirestoreException) {
+                Log.d("Add Category", e.message.toString())
+                emit(Resource.Error(e.message))
+            }
+        }
+
+    fun fetchCategories(): Flow<Resource<List<Category>>> = flow {
+        emit(Resource.Loading())
+        try {
+            val categories = firestore
+                .collection(FirebaseCollections.CATEGORY)
+                .get()
+                .await()
+                .map { it.toCategory() }
+
+            emit(Resource.Success(categories.map { it.toDomain() }))
+        } catch (e: FirebaseFirestoreException) {
+            Log.d("Fetch Categories", e.message.toString())
+            emit(Resource.Error(e.message))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun fetchCategoryDetail(categoryId: String): Flow<Resource<Category>> =
+        flow {
+            emit(Resource.Loading())
+            try {
+                val category = firestore
+                    .collection(FirebaseCollections.CATEGORY)
+                    .document(categoryId)
+                    .get()
+                    .await()
+                    .toCategory()
+
+                emit(Resource.Success(category.toDomain()))
+            } catch (e: FirebaseFirestoreException) {
+                Log.d("Fetch Category Detail", e.message.toString())
+                emit(Resource.Error(e.message))
+            }
+        }.flowOn(Dispatchers.IO)
+
+    fun fetchCategoryImages(): Flow<Resource<List<String>>> = flow {
+        emit(Resource.Loading())
+        try {
+            val categoryImages: List<String> = firestore
+                .collection(FirebaseCollections.CATEGORY)
+                .get()
+                .await()
+                .map { it["imageUrl"].toString() }
+
+            emit(Resource.Success(categoryImages))
+        } catch (e: FirebaseFirestoreException) {
+            Log.d("Fetch Categories", e.message.toString())
             emit(Resource.Error(e.message))
         }
     }

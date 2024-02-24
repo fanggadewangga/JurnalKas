@@ -18,7 +18,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -28,13 +30,16 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.ptotakkanan.jurnalkas.R
-import com.ptotakkanan.jurnalkas.feature.category.CategoryEvent
-import com.ptotakkanan.jurnalkas.feature.category.detail.CategoryViewModel
+import com.ptotakkanan.jurnalkas.feature.category.categories.CategoryViewModel
 import com.ptotakkanan.jurnalkas.feature.category.components.CategoryItem
+import com.ptotakkanan.jurnalkas.feature.common.components.AppDialog
 import com.ptotakkanan.jurnalkas.feature.common.components.AppText
+import com.ptotakkanan.jurnalkas.feature.common.route.Screen
 import com.ptotakkanan.jurnalkas.theme.Typography
+import com.ptotakkanan.jurnalkas.theme.primary10
 import com.ptotakkanan.jurnalkas.theme.primary20
 import kotlinx.coroutines.launch
 
@@ -42,11 +47,22 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun FirstCategoryScreen(
+    navController: NavController,
     pagerState: PagerState,
     viewModel: CategoryViewModel,
 ) {
 
     val scope = rememberCoroutineScope()
+    val state by viewModel.state
+
+    if (state.isLoading)
+        AppDialog(
+            dialogContent = { CircularProgressIndicator(color = primary10) },
+            setShowDialog = {},
+            onCancelClicked = {},
+            onConfirmClicked = {},
+            modifier = Modifier.size(120.dp)
+        )
 
     Column(modifier = Modifier.fillMaxWidth()) {
         AppText(
@@ -62,17 +78,22 @@ fun FirstCategoryScreen(
             maxItemsInEachRow = 3,
             modifier = Modifier.fillMaxWidth()
         ) {
-            viewModel.category.forEach { category ->
+            state.categories.forEach { category ->
                 CategoryItem(
-                    name = category.option.category,
-                    icon = category.option.icon,
-                    selected = category.selected,
+                    category = category,
                     modifier = Modifier
                         .size(90.dp)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = rememberRipple(color = Color.White),
-                            onClick = { viewModel.onEvent(CategoryEvent.SelectCategory(category)) }
+                            onClick = {
+                                navController.navigate(
+                                    Screen.CategoryDetail.route.replace(
+                                        oldValue = "{categoryId}",
+                                        newValue = category.categoryId
+                                    )
+                                )
+                            }
                         )
                 )
             }
@@ -82,7 +103,10 @@ fun FirstCategoryScreen(
                 elevation = CardDefaults.cardElevation(4.dp),
                 modifier = Modifier
                     .size(90.dp)
-                    .clickable { scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) } }
+                    .clickable {
+                        /*scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }*/
+                        navController.navigate(Screen.AddCategory.route)
+                    }
             ) {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                     AsyncImage(

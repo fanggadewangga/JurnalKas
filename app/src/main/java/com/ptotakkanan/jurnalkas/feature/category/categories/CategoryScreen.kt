@@ -1,4 +1,4 @@
-package com.ptotakkanan.jurnalkas.feature.category
+package com.ptotakkanan.jurnalkas.feature.category.categories
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +23,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.ptotakkanan.jurnalkas.R
-import com.ptotakkanan.jurnalkas.feature.category.detail.CategoryViewModel
 import com.ptotakkanan.jurnalkas.feature.category.page.FirstCategoryScreen
 import com.ptotakkanan.jurnalkas.feature.category.page.SecondCategoryScreen
 import com.ptotakkanan.jurnalkas.feature.common.components.AppButton
@@ -71,8 +70,8 @@ fun CategoryScreen(
         Spacer(modifier = Modifier.height(48.dp))
         HorizontalPager(state = pagerState, userScrollEnabled = false) { index ->
             when (index) {
-                0 -> FirstCategoryScreen(pagerState, viewModel)
-                1 -> SecondCategoryScreen(pagerState, viewModel)
+                0 -> FirstCategoryScreen(navController,pagerState, viewModel)
+                1 -> SecondCategoryScreen(navController,pagerState, viewModel)
             }
         }
     }

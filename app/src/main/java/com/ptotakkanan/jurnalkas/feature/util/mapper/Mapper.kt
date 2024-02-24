@@ -1,6 +1,7 @@
 package com.ptotakkanan.jurnalkas.feature.util.mapper
 
 import com.google.firebase.firestore.DocumentSnapshot
+import com.ptotakkanan.jurnalkas.data.model.Category
 import com.ptotakkanan.jurnalkas.data.model.User
 import com.ptotakkanan.jurnalkas.domain.Transaction
 import com.ptotakkanan.jurnalkas.domain.Wallet
@@ -34,5 +35,13 @@ object Mapper{
         balance = getLong("balance") ?: 0,
         phone = getString("phone") ?: "",
         nik = getString("nik") ?: ""
+    )
+
+    fun DocumentSnapshot.toCategory() = Category(
+        categoryId = getString("categoryId") ?: "",
+        name = getString("name") ?: "",
+        description = getString("description") ?: "",
+        example = getString("example") ?: "",
+        imageUrl = getString("imageUrl") ?: ""
     )
 }
