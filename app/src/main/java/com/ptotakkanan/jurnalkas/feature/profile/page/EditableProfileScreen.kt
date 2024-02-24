@@ -202,7 +202,7 @@ fun EditableProfileScreen(
         ) {
             AppButton(
                 onClick = {
-                    viewModel.onEvent(ProfileEvent.SwitchToEditable(false))
+                    viewModel.onEvent(ProfileEvent.UpdateUserData)
                 },
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier

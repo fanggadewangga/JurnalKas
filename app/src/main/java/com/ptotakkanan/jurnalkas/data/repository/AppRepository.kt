@@ -225,4 +225,19 @@ class AppRepository {
             emit(Resource.Error(e.message))
         }
     }
+
+    fun updateUserData(body: User): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading())
+        try {
+            val uid = currentUser!!.uid
+            firestore.collection(FirebaseCollections.USER)
+                .document(uid)
+                .set(body)
+                .await()
+            emit(Resource.Success(Unit))
+        } catch (e: FirebaseFirestoreException) {
+            Log.d("Update User", e.message.toString())
+            emit(Resource.Error(e.message))
+        }
+    }
 }

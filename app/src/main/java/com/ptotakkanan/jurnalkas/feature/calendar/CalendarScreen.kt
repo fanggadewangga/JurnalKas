@@ -2,6 +2,7 @@ package com.ptotakkanan.jurnalkas.feature.calendar
 
 import android.widget.CalendarView
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,6 +40,7 @@ import com.ptotakkanan.jurnalkas.R
 import com.ptotakkanan.jurnalkas.core.ext.toCurrency
 import com.ptotakkanan.jurnalkas.feature.common.components.AppText
 import com.ptotakkanan.jurnalkas.feature.common.navigation.BottomNavigationBar
+import com.ptotakkanan.jurnalkas.feature.common.route.Screen
 import com.ptotakkanan.jurnalkas.feature.common.util.ObserveAsEvents
 import com.ptotakkanan.jurnalkas.feature.input.components.TabOptionItem
 import com.ptotakkanan.jurnalkas.feature.wallet.components.TransactionItem
@@ -127,7 +129,11 @@ fun CalendarScreen(
                 AsyncImage(
                     model = R.drawable.ic_setting,
                     contentDescription = "Setting icon",
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable {
+                            navController.navigate(Screen.Profile.route)
+                        }
                 )
             }
 

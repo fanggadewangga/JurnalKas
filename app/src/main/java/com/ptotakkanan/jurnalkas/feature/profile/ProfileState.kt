@@ -1,8 +1,12 @@
 package com.ptotakkanan.jurnalkas.feature.profile
 
 data class ProfileState(
+    val isLoading: Boolean = false,
+    val uid: String = "",
     val email: String = "daudwakwaw@gmail.com",
-    val name: String = "@daudwakwaw",
+    val name: String = "Daud The Kid",
+    val username: String = "@daudwakwaw",
+    val description: String = "A man who can't be moved",
     val password: String = "abc123",
     val gender: String = "Pria",
     val phone: String = "085748799995",

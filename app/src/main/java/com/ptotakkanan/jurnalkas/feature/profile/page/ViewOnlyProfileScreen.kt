@@ -77,11 +77,11 @@ fun ViewOnlyProfileScreen(
         }
         Column {
             AppText(
-                text = "Daud the Kid",
+                text = state.name,
                 textStyle = Typography.titleMedium().copy(fontSize = 16.sp)
             )
             AppText(
-                text = "Man who can’t be moved",
+                text = state.description,
                 textStyle = Typography.bodyMedium().copy(fontSize = 12.sp)
             )
             Spacer(modifier = Modifier.height(24.dp))
