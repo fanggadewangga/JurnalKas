@@ -1,4 +1,4 @@
-package com.ptotakkanan.jurnalkas.feature.wallet
+package com.ptotakkanan.jurnalkas.feature.wallet.wallet
 
 import com.ptotakkanan.jurnalkas.domain.Wallet
 

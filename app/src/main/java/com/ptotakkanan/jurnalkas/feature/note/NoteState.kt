@@ -5,5 +5,6 @@ import com.ptotakkanan.jurnalkas.domain.Note
 data class NoteState(
     val query: String = "",
     var notes: List<Note> = emptyList(),
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val selectedTab: String = "Pemasukan",
 )

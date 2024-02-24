@@ -4,7 +4,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,6 +30,7 @@ import com.ptotakkanan.jurnalkas.feature.common.components.AppText
 import com.ptotakkanan.jurnalkas.theme.Typography
 import com.ptotakkanan.jurnalkas.theme.green20
 import com.ptotakkanan.jurnalkas.theme.primary20
+import kotlin.math.abs
 
 @Composable
 fun TransactionBox(
@@ -144,7 +144,7 @@ fun TransactionBox(
                 color = primary20
             )
             AppText(
-                text = (income - outcome).toCurrency(),
+                text = abs(income - outcome).toCurrency(),
                 textStyle = Typography
                     .titleMedium()
                     .copy(fontSize = 14.sp, fontWeight = FontWeight(600)),

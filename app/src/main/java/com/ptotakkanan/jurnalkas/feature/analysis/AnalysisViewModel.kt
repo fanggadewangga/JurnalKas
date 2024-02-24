@@ -1,70 +1,87 @@
 package com.ptotakkanan.jurnalkas.feature.analysis
 
-import androidx.compose.runtime.toMutableStateList
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.ptotakkanan.jurnalkas.R
-import com.ptotakkanan.jurnalkas.domain.Analysis
+import androidx.lifecycle.viewModelScope
+import com.ptotakkanan.jurnalkas.data.Resource
+import com.ptotakkanan.jurnalkas.data.repository.AppRepository
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
-class AnalysisViewModel: ViewModel() {
+class AnalysisViewModel : ViewModel() {
 
-    private val _dummyIncome = listOf(
-        Analysis(
-            title = "Gaji",
-            icon = R.drawable.ic_money,
-            nominal = 5000000,
-            isIncome = true,
-            date = "4 Januari, 2023"
-        ),
-        Analysis(
-            title = "Freelance",
-            icon = R.drawable.ic_developer,
-            nominal = 2414141,
-            isIncome = true,
-            date = "2 Januari, 2023"
-        ),
-        Analysis(
-            title = "Bonus",
-            icon = R.drawable.ic_money,
-            nominal = 220424,
-            isIncome = true,
-            date = "6 Januari, 2023"
-        ),
-        Analysis(
-            title = "Project",
-            icon = R.drawable.ic_developer,
-            nominal = 400000,
-            isIncome = true,
-            date = "11 Januari, 2023"
-        ),
-    ).toMutableStateList()
+    val tabOptions = listOf("Pemasukan", "Pengeluaran")
 
-    private val _dummyOutcome = listOf(
-        Analysis(
-            title = "Makan",
-            icon = R.drawable.ic_food,
-            nominal = 35000,
-            isIncome = false,
-            date = "1 Januari, 2023"
-        ),
-        Analysis(
-            title = "Bensin",
-            icon = R.drawable.ic_traffic,
-            nominal = 10000,
-            isIncome = false,
-            date = "3 Januari, 2023"
-        ),
-        Analysis(
-            title = "Jajan",
-            icon = R.drawable.ic_chocolate,
-            nominal = 35000,
-            isIncome = false,
-            date = "1 Januari, 2023"
-        ),
-    ).toMutableStateList()
+    private val _state = mutableStateOf(AnalysisState())
+    val state: State<AnalysisState> = _state
 
-    val dummyIncome: List<Analysis>
-        get() = _dummyIncome
+    private val repository = AppRepository()
 
-    val dummyOutcome: List<Analysis>
-        get() = _dummyOutcome
+    private val channel = Channel<UiEvent>()
+    val eventFlow = channel.receiveAsFlow()
+
+    fun onEvent(event: AnalysisEvent) {
+        when (event) {
+            is AnalysisEvent.FetchIncome -> viewModelScope.launch {
+                repository.fetchAnalysis(true, event.walletId).collectLatest { result ->
+                    when (result) {
+                        is Resource.Loading -> _state.value = _state.value.copy(isLoading = true)
+                        is Resource.Error -> {
+                            _state.value = _state.value.copy(isLoading = false)
+                            channel.send(
+                                UiEvent.ShowErrorToast(
+                                    result.message ?: "Terjadi kesalahan"
+                                )
+                            )
+                        }
+
+                        is Resource.Success -> {
+                            _state.value = _state.value
+                                .copy(
+                                    isLoading = false,
+                                    balance = result.data?.balance ?: 0,
+                                    thisMonthIncome = result.data?.thisMonthNominal ?: 0,
+                                    incomeTransactions = result.data?.transactions ?: emptyList(),
+                                )
+                        }
+                    }
+                }
+            }
+
+            is AnalysisEvent.FetchOutcome -> viewModelScope.launch {
+                repository.fetchAnalysis(false, event.walletId).collectLatest { result ->
+                    when (result) {
+                        is Resource.Loading -> _state.value = _state.value.copy(isLoading = true)
+                        is Resource.Error -> {
+                            _state.value = _state.value.copy(isLoading = false)
+                            channel.send(
+                                UiEvent.ShowErrorToast(
+                                    result.message ?: "Terjadi kesalahan"
+                                )
+                            )
+                        }
+
+                        is Resource.Success -> {
+                            _state.value = _state.value
+                                .copy(
+                                    isLoading = false,
+                                    balance = result.data?.balance ?: 0,
+                                    thisMonthOutcome = result.data?.thisMonthNominal ?: 0,
+                                    outcomeTransactions = result.data?.transactions ?: emptyList(),
+                                )
+                        }
+                    }
+                }
+            }
+
+            is AnalysisEvent.SwitchTab -> _state.value = _state.value.copy(selectedTab = event.tab)
+        }
+    }
+
+    sealed class UiEvent {
+        data class ShowErrorToast(val message: String) : UiEvent()
+    }
 }

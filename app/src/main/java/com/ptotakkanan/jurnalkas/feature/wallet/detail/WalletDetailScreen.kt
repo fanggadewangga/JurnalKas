@@ -2,6 +2,7 @@ package com.ptotakkanan.jurnalkas.feature.wallet.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,7 @@ import com.ptotakkanan.jurnalkas.R
 import com.ptotakkanan.jurnalkas.feature.common.components.AppButton
 import com.ptotakkanan.jurnalkas.feature.common.components.AppDialog
 import com.ptotakkanan.jurnalkas.feature.common.components.AppText
+import com.ptotakkanan.jurnalkas.feature.common.route.Screen
 import com.ptotakkanan.jurnalkas.feature.common.util.ObserveAsEvents
 import com.ptotakkanan.jurnalkas.feature.wallet.components.TransactionBox
 import com.ptotakkanan.jurnalkas.feature.wallet.components.TransactionItem
@@ -58,8 +60,11 @@ fun WalletDetailScreen(
     val state by viewModel.state
 
     ObserveAsEvents(flow = viewModel.eventFlow) { event ->
-        when(event) {
-            is WalletDetailViewModel.UiEvent.ShowErrorMessage -> Toasty.error(context, event.message).show()
+        when (event) {
+            is WalletDetailViewModel.UiEvent.ShowErrorMessage -> Toasty.error(
+                context,
+                event.message
+            ).show()
         }
     }
 
@@ -161,6 +166,14 @@ fun WalletDetailScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
+                .clickable {
+                    navController.navigate(
+                        Screen.Analysis.route.replace(
+                            "{walletId}",
+                            walletId
+                        )
+                    )
+                }
         )
 
 

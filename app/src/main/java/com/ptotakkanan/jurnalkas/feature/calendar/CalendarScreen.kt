@@ -81,7 +81,6 @@ fun CalendarScreen(
                 .padding(bottom = bottomPadding)
                 .background(color = primary20)
                 .padding(top = 32.dp)
-                .verticalScroll(rememberScrollState())
         ) {
 
             Row(
@@ -170,6 +169,7 @@ fun CalendarScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
+                    .height(200.dp)
                     .fillMaxWidth()
                     .padding(start = 24.dp, end = 24.dp)
             ) {
@@ -193,7 +193,9 @@ fun CalendarScreen(
                 elevation = CardDefaults.cardElevation(2.dp),
                 shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
                 colors = CardDefaults.cardColors(containerColor = blue50),
-                modifier = Modifier.fillMaxHeight()
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
             ) {
 
                 Spacer(modifier = Modifier.height(24.dp))

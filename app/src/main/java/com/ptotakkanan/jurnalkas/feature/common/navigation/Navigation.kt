@@ -21,7 +21,7 @@ import com.ptotakkanan.jurnalkas.feature.recap.FinancialRecapScreen
 import com.ptotakkanan.jurnalkas.feature.register.RegisterScreen
 import com.ptotakkanan.jurnalkas.feature.tax.TaxScreen
 import com.ptotakkanan.jurnalkas.feature.wallet.detail.WalletDetailScreen
-import com.ptotakkanan.jurnalkas.feature.wallet.WalletScreen
+import com.ptotakkanan.jurnalkas.feature.wallet.wallet.WalletScreen
 import com.ptotakkanan.jurnalkas.feature.welcome.WelcomeScreen
 
 
@@ -72,8 +72,9 @@ fun Navigation() {
             FinancialRecapScreen(navController = navController)
         }
         
-        composable(route = Screen.Analysis.route) {
-            AnalysisScreen(navController = navController)
+        composable(route = Screen.Analysis.route) {navBackStackEntry ->
+            val walletId = navBackStackEntry.arguments?.getString("walletId")
+            walletId?.let { AnalysisScreen(walletId = it, navController = navController) }
         }
         
         composable(route = Screen.CalendarDetail.route) {

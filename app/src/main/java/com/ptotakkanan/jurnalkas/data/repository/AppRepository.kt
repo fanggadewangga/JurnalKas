@@ -7,14 +7,18 @@ import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.ptotakkanan.jurnalkas.core.ext.convertDateFormat
+import com.ptotakkanan.jurnalkas.core.ext.createTimeStamp
 import com.ptotakkanan.jurnalkas.data.Resource
 import com.ptotakkanan.jurnalkas.data.model.User
 import com.ptotakkanan.jurnalkas.data.util.FirebaseCollections
+import com.ptotakkanan.jurnalkas.domain.Analysis
 import com.ptotakkanan.jurnalkas.domain.Category
 import com.ptotakkanan.jurnalkas.domain.Note
 import com.ptotakkanan.jurnalkas.domain.Transaction
 import com.ptotakkanan.jurnalkas.domain.Wallet
 import com.ptotakkanan.jurnalkas.domain.WalletDetail
+import com.ptotakkanan.jurnalkas.feature.util.date.DateFormat
 import com.ptotakkanan.jurnalkas.feature.util.mapper.Mapper.toCategory
 import com.ptotakkanan.jurnalkas.feature.util.mapper.Mapper.toNote
 import com.ptotakkanan.jurnalkas.feature.util.mapper.Mapper.toTransaction
@@ -339,6 +343,40 @@ class AppRepository {
             emit(Resource.Success(notes.map { it.toDomain() }))
         } catch (e: FirebaseFirestoreException) {
             Log.d("Fetch Notes", e.message.toString())
+            emit(Resource.Error(e.message))
+        }
+    }
+
+    fun fetchAnalysis(isIncome: Boolean, walletId: String): Flow<Resource<Analysis>> = flow {
+        emit(Resource.Loading())
+        try {
+            val month = createTimeStamp(DateFormat.MONTH)
+            val balance = firestore.collection(FirebaseCollections.WALLET)
+                .document(walletId)
+                .get()
+                .await()
+                .getLong("balance") ?: 0
+
+            val transactions = firestore.collection(FirebaseCollections.TRANSACTION)
+                .whereEqualTo("walletId", walletId)
+                .get()
+                .await()
+                .map { it.toTransaction() }
+                .filter { if (isIncome) it.isIncome else !it.isIncome }
+
+            val thisMonthNominal = transactions
+                .filter {
+                    it.date.convertDateFormat(
+                        DateFormat.DATE,
+                        DateFormat.MONTH
+                    ) == month
+                }
+                .sumOf { it.nominal }
+
+            val analysis = Analysis(balance, thisMonthNominal, transactions)
+            emit(Resource.Success(analysis))
+        } catch (e: FirebaseFirestoreException) {
+            Log.d("Fetch Analysis", e.message.toString())
             emit(Resource.Error(e.message))
         }
     }

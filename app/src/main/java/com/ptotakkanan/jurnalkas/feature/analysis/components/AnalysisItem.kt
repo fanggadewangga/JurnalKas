@@ -21,13 +21,14 @@ import coil.compose.AsyncImage
 import com.ptotakkanan.jurnalkas.R
 import com.ptotakkanan.jurnalkas.core.ext.toCurrency
 import com.ptotakkanan.jurnalkas.domain.Analysis
+import com.ptotakkanan.jurnalkas.domain.Transaction
 import com.ptotakkanan.jurnalkas.feature.common.components.AppText
 import com.ptotakkanan.jurnalkas.theme.Typography
 
 @Composable
 fun AnalysisItem(
     modifier: Modifier = Modifier,
-    analysis: Analysis,
+    transaction: Transaction,
 ) {
     Card(
         shape = RoundedCornerShape(20.dp),
@@ -47,12 +48,12 @@ fun AnalysisItem(
             ) {
                 Box {
                     AsyncImage(
-                        model = analysis.icon,
+                        model = transaction.imageUrl,
                         contentDescription = "Note icon",
                         modifier = Modifier.size(32.dp)
                     )
                     AsyncImage(
-                        model = if (analysis.isIncome) R.drawable.ic_income_analysis else R.drawable.ic_outcome_analysis,
+                        model = if (transaction.isIncome) R.drawable.ic_income_analysis else R.drawable.ic_outcome_analysis,
                         contentDescription = "Analysis icon",
                         modifier = Modifier
                             .size(13.dp)
@@ -61,12 +62,12 @@ fun AnalysisItem(
                 }
                 Column {
                     AppText(
-                        text = analysis.title,
+                        text = transaction.title,
                         textStyle = Typography.titleMedium()
                             .copy(fontSize = 12.sp, fontWeight = FontWeight(700))
                     )
                     AppText(
-                        text = analysis.date,
+                        text = transaction.date,
                         textStyle = Typography.titleMedium()
                             .copy(fontSize = 10.sp, fontWeight = FontWeight(700)),
                         color = Color.Gray
@@ -74,7 +75,7 @@ fun AnalysisItem(
                 }
             }
             AppText(
-                text = analysis.nominal.toCurrency(),
+                text = transaction.nominal.toCurrency(),
                 textStyle = Typography
                     .titleMedium()
                     .copy(fontSize = 12.sp, fontWeight = FontWeight(700)),
