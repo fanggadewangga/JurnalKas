@@ -54,8 +54,9 @@ fun Navigation() {
             NoteScreen(navController = navController)
         }
 
-        composable(route = Screen.CategoryDetail.route) {
-            CategoryDetailScreen(navController = navController)
+        composable(route = Screen.CategoryDetail.route) { navBackStackEntry ->
+            val categoryId = navBackStackEntry.arguments?.getString("categoryId")
+            categoryId?.let { CategoryDetailScreen(categoryId = it) }
         }
 
         composable(route = Screen.Wallet.route) {

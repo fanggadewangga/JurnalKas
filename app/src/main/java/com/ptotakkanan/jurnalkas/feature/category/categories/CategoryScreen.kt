@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,6 +30,7 @@ import com.ptotakkanan.jurnalkas.feature.common.components.AppButton
 import com.ptotakkanan.jurnalkas.feature.common.components.AppText
 import com.ptotakkanan.jurnalkas.theme.Typography
 import com.ptotakkanan.jurnalkas.theme.primary20
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -36,6 +38,7 @@ fun CategoryScreen(
     navController: NavController,
     viewModel: CategoryViewModel = viewModel(),
 ) {
+    val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState { 2 }
 
     Column(
@@ -45,7 +48,7 @@ fun CategoryScreen(
             .padding(vertical = 32.dp, horizontal = 24.dp)
     ) {
         AppButton(
-            onClick = { /*TODO*/ },
+            onClick = { scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) } },
             backgroundColor = primary20,
             modifier = Modifier
                 .width(128.dp)
@@ -70,7 +73,7 @@ fun CategoryScreen(
         Spacer(modifier = Modifier.height(48.dp))
         HorizontalPager(state = pagerState, userScrollEnabled = false) { index ->
             when (index) {
-                0 -> FirstCategoryScreen(navController,pagerState, viewModel)
+                0 -> FirstCategoryScreen(navController, viewModel)
                 1 -> SecondCategoryScreen(navController,pagerState, viewModel)
             }
         }

@@ -55,13 +55,18 @@ fun SecondCategoryScreen(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = rememberRipple(color = Color.White),
                         onClick = {
-                            when(category.option.name) {
+                            when (category.option.name) {
                                 "Profil" -> navController.navigate(Screen.Profile.route)
                                 "Book" -> {}
-                                "Dompet" -> {}
+                                "Dompet" -> navController
+                                    .navigate(Screen.Wallet.route) {
+                                        popUpTo(Screen.Category.route) {
+                                            inclusive = true
+                                        }
+                                    }
                                 "Cari" -> navController.navigate(Screen.Note.route)
                                 "Pengingat" -> {}
-                                "Kategori" -> {}
+                                "Kategori" -> scope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) }
                                 "Tentang" -> {}
                                 "Google Drive" -> {}
                                 "Premium" -> {}

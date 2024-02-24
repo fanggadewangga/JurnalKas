@@ -1,6 +1,5 @@
 package com.ptotakkanan.jurnalkas.feature.category.page
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Card
@@ -41,18 +39,16 @@ import com.ptotakkanan.jurnalkas.feature.common.route.Screen
 import com.ptotakkanan.jurnalkas.theme.Typography
 import com.ptotakkanan.jurnalkas.theme.primary10
 import com.ptotakkanan.jurnalkas.theme.primary20
-import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FirstCategoryScreen(
     navController: NavController,
-    pagerState: PagerState,
     viewModel: CategoryViewModel,
 ) {
 
-    val scope = rememberCoroutineScope()
+    rememberCoroutineScope()
     val state by viewModel.state
 
     if (state.isLoading)
@@ -103,10 +99,7 @@ fun FirstCategoryScreen(
                 elevation = CardDefaults.cardElevation(4.dp),
                 modifier = Modifier
                     .size(90.dp)
-                    .clickable {
-                        /*scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }*/
-                        navController.navigate(Screen.AddCategory.route)
-                    }
+                    .clickable { navController.navigate(Screen.AddCategory.route) }
             ) {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                     AsyncImage(

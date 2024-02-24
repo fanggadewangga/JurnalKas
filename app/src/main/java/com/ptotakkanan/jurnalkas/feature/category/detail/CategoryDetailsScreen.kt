@@ -14,7 +14,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,7 +25,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.ptotakkanan.jurnalkas.R
 import com.ptotakkanan.jurnalkas.feature.common.components.AppButton
@@ -31,9 +33,30 @@ import com.ptotakkanan.jurnalkas.theme.Typography
 import com.ptotakkanan.jurnalkas.theme.blue60
 import com.ptotakkanan.jurnalkas.theme.primary20
 import com.ptotakkanan.jurnalkas.theme.secondary10
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ptotakkanan.jurnalkas.feature.common.components.AppDialog
+import com.ptotakkanan.jurnalkas.theme.primary10
 
 @Composable
-fun CategoryDetailScreen(navController: NavController) {
+fun CategoryDetailScreen(
+    categoryId: String,
+    viewModel: CategoryDetailViewModel = viewModel(),
+) {
+
+    val state by viewModel.state
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchCategoryDetail(categoryId)
+    }
+
+    if (state.isLoading)
+        AppDialog(
+            dialogContent = { CircularProgressIndicator(color = primary10) },
+            setShowDialog = {},
+            onCancelClicked = {},
+            onConfirmClicked = {},
+            modifier = Modifier.size(120.dp)
+        )
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -89,12 +112,12 @@ fun CategoryDetailScreen(navController: NavController) {
                     .padding(horizontal = 16.dp, vertical = 32.dp)
             ) {
                 AsyncImage(
-                    model = R.drawable.ic_traffic,
+                    model = state.category?.imageUrl,
                     contentDescription = "Category icon",
                     modifier = Modifier.size(64.dp)
                 )
                 AppText(
-                    text = "Lalu Lintas",
+                    text = state.category?.name ?: "",
                     color = Color.White,
                     textStyle = Typography.titleLarge()
                         .copy(fontSize = 24.sp, fontWeight = FontWeight(700))
@@ -121,7 +144,7 @@ fun CategoryDetailScreen(navController: NavController) {
                         .copy(fontSize = 16.sp, fontWeight = FontWeight(700))
                 )
                 AppText(
-                    text = "Berupa kebutuhan akomodasi secara keseluruhan.",
+                    text = state.category?.description ?: "",
                     color = Color.White,
                     textStyle = Typography.titleSmall()
                         .copy(fontSize = 13.sp, fontWeight = FontWeight(500))
@@ -133,7 +156,7 @@ fun CategoryDetailScreen(navController: NavController) {
                         .copy(fontSize = 16.sp, fontWeight = FontWeight(700))
                 )
                 AppText(
-                    text = "Parkir, bensin, dan biaya Gojek.",
+                    text = state.category?.example ?: "",
                     color = Color.White,
                     textStyle = Typography.titleSmall()
                         .copy(fontSize = 13.sp, fontWeight = FontWeight(500))
