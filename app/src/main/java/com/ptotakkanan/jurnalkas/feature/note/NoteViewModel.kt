@@ -1,12 +1,13 @@
 package com.ptotakkanan.jurnalkas.feature.note
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ptotakkanan.jurnalkas.R
-import com.ptotakkanan.jurnalkas.domain.Note
-import kotlinx.coroutines.delay
+import com.ptotakkanan.jurnalkas.data.Resource
+import com.ptotakkanan.jurnalkas.data.repository.AppRepository
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class NoteViewModel : ViewModel() {
@@ -14,34 +15,55 @@ class NoteViewModel : ViewModel() {
     private val _state = mutableStateOf(NoteState())
     val state = _state
 
-    private val _dummyNote = listOf(
-        Note("Part-time", icon = R.drawable.ic_developer, nominal = 500000, isIncome = true),
-        Note("Pancong", icon = R.drawable.ic_chocolate, nominal = 300000, isOutcome = true),
-        Note("Bus", icon = R.drawable.ic_traffic, nominal = 20000, isOutcome = true),
-    ).toMutableStateList()
+    private val repository = AppRepository()
 
-    val dummyNote: List<Note>
-        get() = _dummyNote
+    private val channel = Channel<UiEvent>()
+    val eventFlow = channel.receiveAsFlow()
 
     fun onEvent(event: NoteEvent) {
         when (event) {
-            is NoteEvent.EnterSearchQuery -> {
-                viewModelScope.launch {
-                    _state.value = _state.value.copy(
-                        query = event.value,
-                        isLoading = true
-                    )
-                    delay(3000L)
-                    _state.value = _state.value.copy(
-                        noteItem = _dummyNote.filter { it.title.contains(event.value) },
-                        isLoading = false
-                    )
+            is NoteEvent.EnterSearchQuery -> _state.value = _state.value.copy(query = event.value)
+            NoteEvent.FetchNotes -> viewModelScope.launch {
+                repository.fetchNotes().collectLatest { result ->
+                    when (result) {
+                        is Resource.Loading -> _state.value = _state.value.copy(isLoading = true)
+                        is Resource.Error -> {
+                            _state.value = _state.value.copy(isLoading = false)
+                            channel.send(
+                                UiEvent.ShowErrorToast(
+                                    result.message ?: "Terjadi kesalahan"
+                                )
+                            )
+                        }
+                        is Resource.Success -> _state.value = _state.value.copy(isLoading = false, notes = result.data ?: emptyList())
+                    }
+                }
+            }
+
+            is NoteEvent.SearchNote -> viewModelScope.launch {
+                repository.searchNote(event.query).collectLatest { result ->
+                    when (result) {
+                        is Resource.Loading -> _state.value = _state.value.copy(isLoading = true)
+                        is Resource.Error -> {
+                            _state.value = _state.value.copy(isLoading = false)
+                            channel.send(
+                                UiEvent.ShowErrorToast(
+                                    result.message ?: "Terjadi kesalahan"
+                                )
+                            )
+                        }
+                        is Resource.Success -> _state.value = _state.value.copy(isLoading = false, notes = result.data ?: emptyList())
+                    }
                 }
             }
         }
     }
 
+    sealed class UiEvent {
+        data class ShowErrorToast(val message: String) : UiEvent()
+    }
+
     init {
-        state.value.noteItem = dummyNote
+        onEvent(NoteEvent.FetchNotes)
     }
 }

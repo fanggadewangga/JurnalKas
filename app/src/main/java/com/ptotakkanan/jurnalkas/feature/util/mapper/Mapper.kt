@@ -2,6 +2,7 @@ package com.ptotakkanan.jurnalkas.feature.util.mapper
 
 import com.google.firebase.firestore.DocumentSnapshot
 import com.ptotakkanan.jurnalkas.data.model.Category
+import com.ptotakkanan.jurnalkas.data.model.Note
 import com.ptotakkanan.jurnalkas.data.model.User
 import com.ptotakkanan.jurnalkas.domain.Transaction
 import com.ptotakkanan.jurnalkas.domain.Wallet
@@ -43,5 +44,12 @@ object Mapper{
         description = getString("description") ?: "",
         example = getString("example") ?: "",
         imageUrl = getString("imageUrl") ?: ""
+    )
+
+    fun DocumentSnapshot.toNote() = Note(
+        title = getString("title") ?: "",
+        imageUrl = getString("imageUrl") ?: "",
+        nominal = getLong("nominal") ?: 0,
+        isIncome = getBoolean("isIncome") ?: false
     )
 }

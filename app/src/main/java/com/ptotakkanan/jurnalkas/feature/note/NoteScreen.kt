@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,12 +28,16 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.ptotakkanan.jurnalkas.R
 import com.ptotakkanan.jurnalkas.feature.common.components.AppButton
+import com.ptotakkanan.jurnalkas.feature.common.components.AppDialog
 import com.ptotakkanan.jurnalkas.feature.common.components.AppSearchField
 import com.ptotakkanan.jurnalkas.feature.common.components.AppText
+import com.ptotakkanan.jurnalkas.feature.common.util.ObserveAsEvents
 import com.ptotakkanan.jurnalkas.feature.note.components.NoteItem
 import com.ptotakkanan.jurnalkas.theme.Typography
 import com.ptotakkanan.jurnalkas.theme.blue60
+import com.ptotakkanan.jurnalkas.theme.primary10
 import com.ptotakkanan.jurnalkas.theme.primary20
+import es.dmoral.toasty.Toasty
 
 @Composable
 fun NoteScreen(
@@ -41,6 +46,21 @@ fun NoteScreen(
 ) {
 
     val state by viewModel.state
+    val context = LocalContext.current
+
+    ObserveAsEvents(flow = viewModel.eventFlow) { event ->
+        when (event) {
+            is NoteViewModel.UiEvent.ShowErrorToast -> Toasty.error(context, event.message).show()
+        }
+    }
+    if (state.isLoading)
+        AppDialog(
+            dialogContent = { CircularProgressIndicator(color = primary10) },
+            setShowDialog = {},
+            onCancelClicked = {},
+            onConfirmClicked = {},
+            modifier = Modifier.size(120.dp)
+        )
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -97,7 +117,10 @@ fun NoteScreen(
                 )
             },
             onValueChange = {
-                viewModel.onEvent(NoteEvent.EnterSearchQuery(it))
+                viewModel.apply {
+                    onEvent(NoteEvent.EnterSearchQuery(it))
+                    onEvent(NoteEvent.SearchNote(it))
+                }
             }
         )
         Spacer(modifier = Modifier.height(48.dp))
@@ -108,7 +131,7 @@ fun NoteScreen(
             )
         else
             LazyColumn {
-                items(state.noteItem) { note ->
+                items(state.notes) { note ->
                     NoteItem(
                         note = note,
                         modifier = Modifier

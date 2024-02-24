@@ -11,10 +11,12 @@ import com.ptotakkanan.jurnalkas.data.Resource
 import com.ptotakkanan.jurnalkas.data.model.User
 import com.ptotakkanan.jurnalkas.data.util.FirebaseCollections
 import com.ptotakkanan.jurnalkas.domain.Category
+import com.ptotakkanan.jurnalkas.domain.Note
 import com.ptotakkanan.jurnalkas.domain.Transaction
 import com.ptotakkanan.jurnalkas.domain.Wallet
 import com.ptotakkanan.jurnalkas.domain.WalletDetail
 import com.ptotakkanan.jurnalkas.feature.util.mapper.Mapper.toCategory
+import com.ptotakkanan.jurnalkas.feature.util.mapper.Mapper.toNote
 import com.ptotakkanan.jurnalkas.feature.util.mapper.Mapper.toTransaction
 import com.ptotakkanan.jurnalkas.feature.util.mapper.Mapper.toUser
 import com.ptotakkanan.jurnalkas.feature.util.mapper.Mapper.toWallet
@@ -306,6 +308,37 @@ class AppRepository {
             emit(Resource.Success(categoryImages))
         } catch (e: FirebaseFirestoreException) {
             Log.d("Fetch Categories", e.message.toString())
+            emit(Resource.Error(e.message))
+        }
+    }
+
+    fun fetchNotes(): Flow<Resource<List<Note>>> = flow {
+        emit(Resource.Loading())
+        try {
+            val notes: List<com.ptotakkanan.jurnalkas.data.model.Note> = firestore
+                .collection(FirebaseCollections.TRANSACTION)
+                .get()
+                .await()
+                .map { it.toNote() }
+            emit(Resource.Success(notes.map { it.toDomain() }))
+        } catch (e: FirebaseFirestoreException) {
+            Log.d("Fetch Notes", e.message.toString())
+            emit(Resource.Error(e.message))
+        }
+    }
+
+    fun searchNote(query: String): Flow<Resource<List<Note>>> = flow {
+        emit(Resource.Loading())
+        try {
+            val notes: List<com.ptotakkanan.jurnalkas.data.model.Note> = firestore
+                .collection(FirebaseCollections.TRANSACTION)
+                .get()
+                .await()
+                .map { it.toNote() }
+                .filter { it.title.contains(query, ignoreCase = true) }
+            emit(Resource.Success(notes.map { it.toDomain() }))
+        } catch (e: FirebaseFirestoreException) {
+            Log.d("Fetch Notes", e.message.toString())
             emit(Resource.Error(e.message))
         }
     }

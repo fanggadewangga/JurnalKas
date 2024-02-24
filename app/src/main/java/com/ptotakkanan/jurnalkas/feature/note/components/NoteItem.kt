@@ -45,7 +45,7 @@ fun NoteItem(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 AsyncImage(
-                    model = note.icon,
+                    model = note.imageUrl,
                     contentDescription = "Note icon",
                     modifier = Modifier.size(32.dp)
                 )
