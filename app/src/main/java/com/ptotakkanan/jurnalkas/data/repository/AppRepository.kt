@@ -1,6 +1,8 @@
 package com.ptotakkanan.jurnalkas.data.repository
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestoreException
@@ -8,8 +10,11 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.ptotakkanan.jurnalkas.core.ext.convertDateFormat
+import com.ptotakkanan.jurnalkas.core.ext.convertDateToMillis
 import com.ptotakkanan.jurnalkas.core.ext.createTimeStamp
 import com.ptotakkanan.jurnalkas.data.Resource
+import com.ptotakkanan.jurnalkas.data.model.InRangeTransaction
+import com.ptotakkanan.jurnalkas.data.model.InRangeWalletDetail
 import com.ptotakkanan.jurnalkas.data.model.User
 import com.ptotakkanan.jurnalkas.data.util.FirebaseCollections
 import com.ptotakkanan.jurnalkas.domain.Analysis
@@ -380,4 +385,56 @@ class AppRepository {
             emit(Resource.Error(e.message))
         }
     }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun fetchInRangeWalletDetail(walletId: String, start: String, end: String): Flow<Resource<InRangeWalletDetail>> =
+        flow {
+            emit(Resource.Loading())
+            try {
+                val startMillis = convertDateToMillis(start)
+                val endMillis = convertDateToMillis(end)
+
+                val transactions = firestore.collection(FirebaseCollections.TRANSACTION)
+                    .whereEqualTo("walletId", walletId)
+                    .get()
+                    .await()
+                    .documents.mapNotNull { document ->
+                        val date = document.getString("date") ?: ""
+                        val dateMillis = convertDateToMillis(date)
+                        if (dateMillis in startMillis..endMillis)
+                            document.toTransaction()
+                        else
+                            null
+                    }
+                val income = transactions.filter { it.isIncome }.sumOf { it.nominal }
+                val outcome = transactions.filter { !it.isIncome }.sumOf { it.nominal }
+
+                val incomeCategories = transactions
+                    .filter { it.isIncome }
+                    .groupBy { it.title }
+                    .map { (category, categoryTransactions) ->
+                        InRangeTransaction(
+                            category = category,
+                            nominal = categoryTransactions.sumOf { it.nominal }
+                        )
+                    }
+
+                val outcomeCategories = transactions
+                    .filter { !it.isIncome }
+                    .groupBy { it.title }
+                    .map { (category, categoryTransactions) ->
+                        InRangeTransaction(
+                            category = category,
+                            nominal = categoryTransactions.sumOf { it.nominal }
+                        )
+                    }
+
+                val walletDetail = InRangeWalletDetail(income, outcome, incomeCategories, outcomeCategories)
+                emit(Resource.Success(walletDetail))
+            } catch (e: FirebaseFirestoreException) {
+                Log.d("Fetch Wallet Detail", e.message.toString())
+                emit(Resource.Error(e.message))
+            }
+        }.flowOn(Dispatchers.IO)
+
 }
