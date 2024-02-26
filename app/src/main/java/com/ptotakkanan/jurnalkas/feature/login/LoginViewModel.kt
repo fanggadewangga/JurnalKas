@@ -79,6 +79,8 @@ class LoginViewModel: ViewModel() {
                     }
                 }
             }
+
+            LoginEvent.Logout -> repository.logout()
         }
     }
 

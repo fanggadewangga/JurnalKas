@@ -190,6 +190,7 @@ fun LoginScreen(
                     modifier = Modifier
                         .height(44.dp)
                         .width((screenWidth * 0.4).dp)
+                        .clickable { viewModel.onEvent(LoginEvent.Logout) }
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),

@@ -24,6 +24,8 @@ import coil.compose.AsyncImage
 import com.ptotakkanan.jurnalkas.R
 import com.ptotakkanan.jurnalkas.feature.common.components.AppButton
 import com.ptotakkanan.jurnalkas.feature.common.components.AppText
+import com.ptotakkanan.jurnalkas.feature.common.route.Screen
+import com.ptotakkanan.jurnalkas.feature.common.util.ObserveAsEvents
 import com.ptotakkanan.jurnalkas.feature.profile.page.EditableProfileScreen
 import com.ptotakkanan.jurnalkas.feature.profile.page.ViewOnlyProfileScreen
 import com.ptotakkanan.jurnalkas.theme.Typography
@@ -34,6 +36,19 @@ import com.ptotakkanan.jurnalkas.theme.primary20
 fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel = viewModel()) {
 
     val state by viewModel.state
+
+    ObserveAsEvents(flow = viewModel.eventFlow) { event ->
+        when (event) {
+            is ProfileViewModel.UiEvent.NavigateToLogin -> navController.navigate(Screen.Login.route) {
+                popUpTo(Screen.Profile.route) {
+                    inclusive = true
+                }
+            }
+
+            is ProfileViewModel.UiEvent.ShowErrorMessage -> TODO()
+            ProfileViewModel.UiEvent.SwitchToEditable -> TODO()
+        }
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

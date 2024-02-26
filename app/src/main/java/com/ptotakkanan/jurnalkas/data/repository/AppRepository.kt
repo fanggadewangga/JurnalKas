@@ -437,4 +437,14 @@ class AppRepository {
             }
         }.flowOn(Dispatchers.IO)
 
+    fun logout(): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading())
+        try {
+            firebaseAuth.signOut()
+            emit(Resource.Success(Unit))
+        } catch (e: Exception) {
+            Log.d("Logout", e.message.toString())
+            emit(Resource.Error(e.message))
+        }
+    }
 }

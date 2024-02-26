@@ -10,4 +10,5 @@ sealed class ProfileEvent {
     data class SwitchToEditable(val value: Boolean) : ProfileEvent()
     data object FetchProfile: ProfileEvent()
     data object UpdateUserData: ProfileEvent()
+    data object Logout: ProfileEvent()
 }

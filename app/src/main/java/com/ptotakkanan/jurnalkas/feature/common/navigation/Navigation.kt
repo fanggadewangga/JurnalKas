@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ptotakkanan.jurnalkas.feature.analysis.AnalysisScreen
+import com.ptotakkanan.jurnalkas.feature.backup.BackupScreen
 import com.ptotakkanan.jurnalkas.feature.calendar.calendar.CalendarScreen
 import com.ptotakkanan.jurnalkas.feature.calendar.detail.CalendarDetailScreen
 import com.ptotakkanan.jurnalkas.feature.category.add.AddCategoryScreen
@@ -94,6 +95,10 @@ fun Navigation() {
 
         composable(route = Screen.Calendar.route) {
             CalendarScreen(navController = navController)
+        }
+        
+        composable(route = Screen.Backup.route) {
+            BackupScreen(navController = navController)
         }
     }
 }

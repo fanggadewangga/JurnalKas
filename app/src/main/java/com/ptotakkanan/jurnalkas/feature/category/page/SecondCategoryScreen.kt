@@ -68,7 +68,7 @@ fun SecondCategoryScreen(
                                 "Pengingat" -> {}
                                 "Kategori" -> scope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) }
                                 "Tentang" -> {}
-                                "Google Drive" -> {}
+                                "Google Drive" -> { navController.navigate(Screen.Backup.route) }
                                 "Premium" -> {}
                             }
                         }

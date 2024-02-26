@@ -17,6 +17,7 @@ sealed class Screen(val route: String) {
     data object Input: Screen("input")
     data object AddCategory: Screen("add_category")
     data object Calendar: Screen("calendar")
+    data object Backup: Screen("backup")
 
     fun withArgs(vararg args: String) = buildString {
         append(route)

@@ -155,5 +155,16 @@ fun ViewOnlyProfileScreen(
                 .fillMaxWidth()
                 .padding(start = 24.dp, top = 8.dp, end = 24.dp, bottom = 24.dp)
         )
+        AsyncImage(
+            model = R.drawable.ic_logout,
+            contentDescription = "Logout",
+            modifier = Modifier
+                .size(24.dp)
+                .align(Alignment.CenterHorizontally)
+                .clickable {
+                    viewModel.onEvent(ProfileEvent.Logout)
+                }
+        )
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
